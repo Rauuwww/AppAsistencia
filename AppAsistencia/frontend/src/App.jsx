@@ -3,6 +3,8 @@ import Navigation from './components/Navigation';
 import AttendanceScanner from './components/AttendanceScanner';
 import EventsList from './components/EventsList';
 import AttendanceList from './components/AttendanceList';
+import EventRegistration from './components/EventRegistration';
+import AssistantRegistration from './components/AssistantRegistration';
 
 function App() {
   const [activeTab, setActiveTab] = useState('scanner');
@@ -11,6 +13,10 @@ function App() {
     switch (activeTab) {
       case 'scanner':
         return <AttendanceScanner />;
+      case 'register-event':
+        return <EventRegistration />;
+      case 'register-assistant':
+        return <AssistantRegistration />;
       case 'events':
         return <EventsList />;
       case 'attendance':

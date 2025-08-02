@@ -118,10 +118,20 @@ exports.cambiarEstadoAsistencia = async (req, res) => {
 
     const asistenciaId = rows[0].id;
 
-    await db.execute(
-      'UPDATE asistencias SET asistio = ? WHERE id = ?',
-      [asistio, asistenciaId]
-    );
+    // Si se está marcando como asistió (1), actualizar la fecha y hora actual
+    if (asistio == 1) {
+      const fechaActual = new Date();
+      await db.execute(
+        'UPDATE asistencias SET asistio = ?, fecha = ? WHERE id = ?',
+        [asistio, fechaActual, asistenciaId]
+      );
+    } else {
+      // Si se está marcando como no asistió, solo cambiar el estado
+      await db.execute(
+        'UPDATE asistencias SET asistio = ? WHERE id = ?',
+        [asistio, asistenciaId]
+      );
+    }
 
     res.json({ success: true });
   } catch (err) {
