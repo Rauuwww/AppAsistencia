@@ -5,6 +5,7 @@ const Navigation = ({ activeTab, setActiveTab }) => {
     { id: 'scanner', label: 'Escáner QR', icon: '📱' },
     { id: 'register-event', label: 'Registrar Evento', icon: '🎪' },
     { id: 'register-assistant', label: 'Registrar Asistente', icon: '📝' },
+    { id: 'qr-generator', label: 'Generar QR', icon: '🎨' },
     { id: 'events', label: 'Ver Eventos', icon: '📅' },
     { id: 'attendance', label: 'Asistencias', icon: '👥' },
   ];

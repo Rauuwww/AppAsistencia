@@ -5,6 +5,7 @@ import EventsList from './components/EventsList';
 import AttendanceList from './components/AttendanceList';
 import EventRegistration from './components/EventRegistration';
 import AssistantRegistration from './components/AssistantRegistration';
+import QRGenerator from './components/QRGenerator';
 
 function App() {
   const [activeTab, setActiveTab] = useState('scanner');
@@ -17,6 +18,8 @@ function App() {
         return <EventRegistration />;
       case 'register-assistant':
         return <AssistantRegistration />;
+      case 'qr-generator':
+        return <QRGenerator />;
       case 'events':
         return <EventsList />;
       case 'attendance':
