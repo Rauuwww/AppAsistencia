@@ -61,7 +61,7 @@ exports.obtenerAsistencias = async (req, res) => {
     try {
         const [rows] = await db.execute(`
       SELECT a.id, a.invitadoId, a.nombreUsuario, a.empresa,
-             e.nombre AS eventoNombre, a.fecha, a.asistio
+             e.nombre AS eventoNombre, a.eventoId, a.fecha, a.asistio
       FROM asistencias a
       JOIN eventos e ON a.eventoId = e.id
     `);
