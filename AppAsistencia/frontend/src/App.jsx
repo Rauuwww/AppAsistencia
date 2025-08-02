@@ -1,0 +1,53 @@
+import React, { useState } from 'react';
+import Navigation from './components/Navigation';
+import AttendanceScanner from './components/AttendanceScanner';
+import EventsList from './components/EventsList';
+import AttendanceList from './components/AttendanceList';
+
+function App() {
+  const [activeTab, setActiveTab] = useState('scanner');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'scanner':
+        return <AttendanceScanner />;
+      case 'events':
+        return <EventsList />;
+      case 'attendance':
+        return <AttendanceList />;
+      default:
+        return <AttendanceScanner />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Sistema de Asistencia QR
+          </h1>
+          <p className="text-gray-600">
+            Gestión de eventos y control de asistencia mediante códigos QR
+          </p>
+        </div>
+
+        {/* Navigation */}
+        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {/* Content */}
+        <div className="max-w-6xl mx-auto">
+          {renderContent()}
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-12 text-center text-gray-500 text-sm">
+          <p>&copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.</p>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+export default App;
