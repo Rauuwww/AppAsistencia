@@ -8,6 +8,8 @@ const AttendanceScanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success', 'error', 'info'
+  const [showEntradasModal, setShowEntradasModal] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const showMessage = (text, type = 'info') => {
     setMessage(text);
@@ -18,11 +20,29 @@ const AttendanceScanner = () => {
     }, 5000);
   };
 
+  const obtenerDatosUsuario = async (invitadoId) => {
+    try {
+      const response = await asistenciasAPI.obtenerAsistencias();
+      const asistencia = response.data.find(a => a.invitadoId === invitadoId);
+      return asistencia;
+    } catch (error) {
+      console.error('Error obteniendo datos del usuario:', error);
+      return null;
+    }
+  };
+
   const handleScanSuccess = async (invitadoId) => {
     setScanResult(invitadoId);
     setIsLoading(true);
     
     try {
+      // Obtener datos del usuario
+      const userInfo = await obtenerDatosUsuario(invitadoId);
+      if (userInfo) {
+        setUserData(userInfo);
+        setShowEntradasModal(true);
+      }
+
       // Marcar como asistió (1)
       await asistenciasAPI.cambiarEstadoAsistencia(invitadoId, 1);
       setAttendanceStatus('confirmed');
@@ -48,6 +68,8 @@ const AttendanceScanner = () => {
     setScanResult('');
     setAttendanceStatus(null);
     setMessage('');
+    setShowEntradasModal(false);
+    setUserData(null);
   };
 
   const markAsNotAttended = async () => {
@@ -65,6 +87,10 @@ const AttendanceScanner = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const closeEntradasModal = () => {
+    setShowEntradasModal(false);
   };
 
   return (
@@ -163,6 +189,54 @@ const AttendanceScanner = () => {
       <div className="mt-6 text-sm text-gray-500 text-center">
         <p>El código QR debe contener el ID del invitado generado por el sistema.</p>
       </div>
+
+      {/* Modal de Número de Entradas */}
+      {showEntradasModal && userData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Información del Invitado
+              </h3>
+              
+              <div className="text-left space-y-3 mb-6">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Nombre:</p>
+                  <p className="text-base text-gray-900">{userData.nombreUsuario}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Empresa:</p>
+                  <p className="text-base text-gray-900">{userData.empresa}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Evento:</p>
+                  <p className="text-base text-gray-900">{userData.eventoNombre}</p>
+                </div>
+                
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm font-medium text-blue-600">Número de Entradas:</p>
+                  <p className="text-2xl font-bold text-blue-700">{userData.noEntradas || 1}</p>
+                </div>
+              </div>
+              
+              <button
+                onClick={closeEntradasModal}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
