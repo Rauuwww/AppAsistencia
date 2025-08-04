@@ -6,6 +6,7 @@ const AttendanceList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all'); // 'all', 'attended', 'not_attended'
+  const [editingEntradas, setEditingEntradas] = useState(null);
 
   useEffect(() => {
     cargarAsistencias();
@@ -31,6 +32,17 @@ const AttendanceList = () => {
     } catch (error) {
       console.error('Error changing attendance status:', error);
       setError('Error al cambiar el estado de asistencia');
+    }
+  };
+
+  const actualizarNoEntradas = async (invitadoId, noEntradas) => {
+    try {
+      await asistenciasAPI.actualizarNoEntradas(invitadoId, noEntradas);
+      await cargarAsistencias(); // Recargar la lista
+      setEditingEntradas(null);
+    } catch (error) {
+      console.error('Error updating number of entries:', error);
+      setError('Error al actualizar el número de entradas');
     }
   };
 
@@ -156,6 +168,9 @@ const AttendanceList = () => {
                   Estado
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Entradas
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
@@ -186,6 +201,35 @@ const AttendanceList = () => {
                     }`}>
                       {asistencia.asistio ? 'Asistió' : 'No Asistió'}
                     </span>
+                  </td>
+                  <td className="px-4 py-2 text-sm">
+                    {editingEntradas === asistencia.invitadoId ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          defaultValue={asistencia.noEntradas}
+                          className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              actualizarNoEntradas(asistencia.invitadoId, parseInt(e.target.value));
+                            }
+                          }}
+                          onBlur={(e) => {
+                            actualizarNoEntradas(asistencia.invitadoId, parseInt(e.target.value));
+                          }}
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <span 
+                        className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+                        onClick={() => setEditingEntradas(asistencia.invitadoId)}
+                      >
+                        {asistencia.noEntradas || 1}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <button

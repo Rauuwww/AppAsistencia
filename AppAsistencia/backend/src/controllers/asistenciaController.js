@@ -28,7 +28,7 @@ exports.obtenerEventos = async (req, res) => {
 
 // Registrar asistencia con invitadoId generado automáticamente
 exports.registrarAsistencia = async (req, res) => {
-    const { nombreUsuario, empresa, eventoId, asistio } = req.body;
+    const { nombreUsuario, empresa, eventoId, asistio, noEntradas } = req.body;
     const fecha = new Date();
 
     try {
@@ -45,9 +45,9 @@ exports.registrarAsistencia = async (req, res) => {
         const invitadoId = `${nombreEvento}_${usuarioSan}_${empresaSan}`;
 
         await db.execute(
-            `INSERT INTO asistencias (invitadoId, nombreUsuario, empresa, eventoId, fecha, asistio)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-            [invitadoId, nombreUsuario, empresa, eventoId, fecha, asistio ?? 1]
+            `INSERT INTO asistencias (invitadoId, nombreUsuario, empresa, eventoId, fecha, asistio, noEntradas)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [invitadoId, nombreUsuario, empresa, eventoId, fecha, asistio ?? 1, noEntradas ?? 1]
         );
 
         res.json({ success: true, invitadoId });
@@ -61,7 +61,7 @@ exports.obtenerAsistencias = async (req, res) => {
     try {
         const [rows] = await db.execute(`
       SELECT a.id, a.invitadoId, a.nombreUsuario, a.empresa,
-             e.nombre AS eventoNombre, a.eventoId, a.fecha, a.asistio
+             e.nombre AS eventoNombre, a.eventoId, a.fecha, a.asistio, a.noEntradas
       FROM asistencias a
       JOIN eventos e ON a.eventoId = e.id
     `);
@@ -76,7 +76,7 @@ exports.exportarCSV = async (req, res) => {
     try {
         const [rows] = await db.execute(`
       SELECT a.invitadoId, a.nombreUsuario, a.empresa, 
-             e.nombre AS evento, a.fecha, a.asistio
+             e.nombre AS evento, a.fecha, a.asistio, a.noEntradas
       FROM asistencias a
       JOIN eventos e ON a.eventoId = e.id
     `);
@@ -132,6 +132,35 @@ exports.cambiarEstadoAsistencia = async (req, res) => {
         [asistio, asistenciaId]
       );
     }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Actualizar número de entradas de una asistencia
+exports.actualizarNoEntradas = async (req, res) => {
+  const { invitadoId } = req.params;
+  const { noEntradas } = req.body;
+
+  try {
+    // Actualizamos la asistencia más reciente del invitado
+    const [rows] = await db.execute(
+      'SELECT id FROM asistencias WHERE invitadoId = ? ORDER BY fecha DESC LIMIT 1',
+      [invitadoId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Asistencia no encontrada para ese invitado' });
+    }
+
+    const asistenciaId = rows[0].id;
+
+    await db.execute(
+      'UPDATE asistencias SET noEntradas = ? WHERE id = ?',
+      [noEntradas, asistenciaId]
+    );
 
     res.json({ success: true });
   } catch (err) {

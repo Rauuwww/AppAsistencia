@@ -31,6 +31,10 @@ export const asistenciasAPI = {
   cambiarEstadoAsistencia: (invitadoId, asistio) => 
     api.put(`/asistencia/${invitadoId}/estado`, { asistio }),
   
+  // Actualizar número de entradas de una asistencia
+  actualizarNoEntradas: (invitadoId, noEntradas) => 
+    api.put(`/asistencia/${invitadoId}/entradas`, { noEntradas }),
+  
   // Exportar CSV
   exportarCSV: () => api.get('/exportar', { responseType: 'blob' }),
 };

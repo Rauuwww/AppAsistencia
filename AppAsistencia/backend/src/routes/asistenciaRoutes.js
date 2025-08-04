@@ -11,6 +11,8 @@ router.post('/asistencia', controller.registrarAsistencia);
 router.get('/asistencias', controller.obtenerAsistencias);
 // Cambiar estado de asistencia (asistió/no asistió) — aquí cambiamos :id por :invitadoId
 router.put('/asistencia/:invitadoId/estado', controller.cambiarEstadoAsistencia);
+// Actualizar número de entradas de una asistencia
+router.put('/asistencia/:invitadoId/entradas', controller.actualizarNoEntradas);
 
 router.get('/exportar', controller.exportarCSV);
 

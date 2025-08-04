@@ -5,7 +5,8 @@ const AssistantRegistration = () => {
   const [formData, setFormData] = useState({
     nombreUsuario: '',
     empresa: '',
-    eventoId: ''
+    eventoId: '',
+    noEntradas: 1
   });
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +63,8 @@ const AssistantRegistration = () => {
       setFormData({
         nombreUsuario: '',
         empresa: '',
-        eventoId: ''
+        eventoId: '',
+        noEntradas: 1
       });
     } catch (error) {
       console.error('Error registering assistant:', error);
@@ -106,7 +108,7 @@ const AssistantRegistration = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Nombre del Usuario */}
             <div>
               <label htmlFor="nombreUsuario" className="block text-sm font-medium text-gray-700 mb-2">
@@ -136,6 +138,24 @@ const AssistantRegistration = () => {
                 value={formData.empresa}
                 onChange={handleInputChange}
                 placeholder="Ingrese el nombre de la empresa"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            {/* Número de Entradas */}
+            <div>
+              <label htmlFor="noEntradas" className="block text-sm font-medium text-gray-700 mb-2">
+                Número de Entradas
+              </label>
+              <input
+                type="number"
+                id="noEntradas"
+                name="noEntradas"
+                value={formData.noEntradas}
+                onChange={handleInputChange}
+                min="1"
+                max="10"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
