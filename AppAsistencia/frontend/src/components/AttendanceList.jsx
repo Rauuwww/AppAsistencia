@@ -71,35 +71,33 @@ const AttendanceList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="px-4 py-3 rounded mb-4" style={{ backgroundColor: 'var(--color-error)', color: 'white', border: '1px solid var(--color-error)' }}>
+      <div className="bg-error text-white border border-error px-4 py-3 rounded mb-4">
         {error}
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+    <div className="bg-surface border border-border rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Lista de Asistencias</h2>
+        <h2 className="text-2xl font-bold text-text-primary">Lista de Asistencias</h2>
         <div className="flex gap-2">
           <button
             onClick={exportarCSV}
-            className="px-4 py-2 rounded-lg transition-colors"
-            style={{ backgroundColor: 'var(--color-success)', color: 'white' }}
+            className="bg-success text-white px-4 py-2 rounded-lg transition-colors"
           >
             Exportar CSV
           </button>
           <button
             onClick={cargarAsistencias}
-            className="px-4 py-2 rounded-lg transition-colors"
-            style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+            className="bg-primary text-white px-4 py-2 rounded-lg transition-colors"
           >
             Actualizar
           </button>
@@ -113,13 +111,9 @@ const AttendanceList = () => {
             onClick={() => setFilter('all')}
             className={`px-3 py-1 text-sm rounded transition-colors ${
               filter === 'all' 
-                ? 'text-white' 
-                : 'hover:bg-opacity-10'
+                ? 'bg-primary text-white' 
+                : 'bg-highlight text-text-secondary hover:text-text-primary'
             }`}
-            style={{
-              backgroundColor: filter === 'all' ? 'var(--color-primary)' : 'var(--color-highlight)',
-              color: filter === 'all' ? 'white' : 'var(--color-text-secondary)'
-            }}
           >
             Todos ({asistencias.length})
           </button>
@@ -127,13 +121,9 @@ const AttendanceList = () => {
             onClick={() => setFilter('attended')}
             className={`px-3 py-1 text-sm rounded transition-colors ${
               filter === 'attended' 
-                ? 'text-white' 
-                : 'hover:bg-opacity-10'
+                ? 'bg-success text-white' 
+                : 'bg-highlight text-text-secondary hover:text-text-primary'
             }`}
-            style={{
-              backgroundColor: filter === 'attended' ? 'var(--color-success)' : 'var(--color-highlight)',
-              color: filter === 'attended' ? 'white' : 'var(--color-text-secondary)'
-            }}
           >
             Asistieron ({asistencias.filter(a => a.asistio === 1).length})
           </button>
@@ -141,13 +131,9 @@ const AttendanceList = () => {
             onClick={() => setFilter('not_attended')}
             className={`px-3 py-1 text-sm rounded transition-colors ${
               filter === 'not_attended' 
-                ? 'text-white' 
-                : 'hover:bg-opacity-10'
+                ? 'bg-error text-white' 
+                : 'bg-highlight text-text-secondary hover:text-text-primary'
             }`}
-            style={{
-              backgroundColor: filter === 'not_attended' ? 'var(--color-error)' : 'var(--color-highlight)',
-              color: filter === 'not_attended' ? 'white' : 'var(--color-text-secondary)'
-            }}
           >
             No Asistieron ({asistencias.filter(a => a.asistio === 0).length})
           </button>
@@ -155,67 +141,64 @@ const AttendanceList = () => {
       </div>
 
       {asistenciasFiltradas.length === 0 ? (
-        <div className="text-center py-8" style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-center py-8 text-text-secondary">
           <p>No hay asistencias registradas</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
-              <tr style={{ backgroundColor: 'var(--color-highlight)' }}>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+              <tr className="bg-highlight">
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Invitado ID
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Nombre
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Empresa
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Evento
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Fecha
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Estado
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Entradas
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Acciones
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
+            <tbody className="divide-y divide-border">
               {asistenciasFiltradas.map((asistencia) => (
-                <tr key={asistencia.id} className="hover:bg-opacity-10" style={{ ':hover': { backgroundColor: 'var(--color-highlight)' } }}>
-                  <td className="px-4 py-2 text-sm break-all" style={{ color: 'var(--color-text-primary)' }}>
+                <tr key={asistencia.id} className="hover:bg-highlight">
+                  <td className="px-4 py-2 text-sm break-all text-text-primary">
                     {asistencia.invitadoId}
                   </td>
-                  <td className="px-4 py-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                  <td className="px-4 py-2 text-sm text-text-primary">
                     {asistencia.nombreUsuario}
                   </td>
-                  <td className="px-4 py-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                  <td className="px-4 py-2 text-sm text-text-primary">
                     {asistencia.empresa}
                   </td>
-                  <td className="px-4 py-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                  <td className="px-4 py-2 text-sm text-text-primary">
                     {asistencia.eventoNombre}
                   </td>
-                  <td className="px-4 py-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                  <td className="px-4 py-2 text-sm text-text-primary">
                     {new Date(asistencia.fecha).toLocaleDateString('es-ES')}
                   </td>
                   <td className="px-4 py-2 text-sm">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white ${
                       asistencia.asistio 
-                        ? 'text-white' 
-                        : 'text-white'
-                    }`}
-                    style={{
-                      backgroundColor: asistencia.asistio ? 'var(--color-success)' : 'var(--color-error)'
-                    }}>
+                        ? 'bg-success' 
+                        : 'bg-error'
+                    }`}>
                       {asistencia.asistio ? 'Asistió' : 'No Asistió'}
                     </span>
                   </td>
@@ -227,12 +210,7 @@ const AttendanceList = () => {
                           min="1"
                           max="10"
                           defaultValue={asistencia.noEntradas}
-                          className="w-16 px-2 py-1 text-sm rounded"
-                          style={{
-                            backgroundColor: 'var(--color-highlight)',
-                            border: '1px solid var(--color-border)',
-                            color: 'var(--color-text-primary)'
-                          }}
+                          className="w-16 px-2 py-1 text-sm bg-highlight border border-border rounded text-text-primary"
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
                               actualizarNoEntradas(asistencia.invitadoId, parseInt(e.target.value));
@@ -246,11 +224,7 @@ const AttendanceList = () => {
                       </div>
                     ) : (
                       <span 
-                        className="cursor-pointer hover:bg-opacity-10 px-2 py-1 rounded"
-                        style={{ 
-                          color: 'var(--color-text-primary)',
-                          ':hover': { backgroundColor: 'var(--color-highlight)' }
-                        }}
+                        className="cursor-pointer hover:bg-highlight px-2 py-1 rounded text-text-primary"
                         onClick={() => setEditingEntradas(asistencia.invitadoId)}
                       >
                         {asistencia.noEntradas || 1}
@@ -260,11 +234,9 @@ const AttendanceList = () => {
                   <td className="px-4 py-2 text-sm">
                     <button
                       onClick={() => cambiarEstadoAsistencia(asistencia.invitadoId, asistencia.asistio ? 0 : 1)}
-                      className="px-3 py-1 text-xs rounded transition-colors"
-                      style={{
-                        backgroundColor: asistencia.asistio ? 'var(--color-error)' : 'var(--color-success)',
-                        color: 'white'
-                      }}
+                      className={`px-3 py-1 text-xs rounded transition-colors text-white ${
+                        asistencia.asistio ? 'bg-error' : 'bg-success'
+                      }`}
                     >
                       {asistencia.asistio ? 'Marcar No Asistió' : 'Marcar Asistió'}
                     </button>

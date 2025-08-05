@@ -89,27 +89,20 @@ const AssistantRegistration = () => {
     return `${nombreEvento}_${usuarioSan}_${empresaSan}`;
   };
 
-  const getMessageStyle = (type) => {
-    switch (type) {
-      case 'success':
-        return { backgroundColor: 'var(--color-success)', color: 'white', border: '1px solid var(--color-success)' };
-      case 'error':
-        return { backgroundColor: 'var(--color-error)', color: 'white', border: '1px solid var(--color-error)' };
-      default:
-        return { backgroundColor: 'var(--color-primary)', color: 'white', border: '1px solid var(--color-primary)' };
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
+      <div className="bg-surface border border-border rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 text-text-primary">
           📝 Registro de Asistentes
         </h2>
 
         {/* Message Alert */}
         {message && (
-          <div className="mb-4 p-4 rounded-lg" style={getMessageStyle(messageType)}>
+          <div className={`mb-4 p-4 rounded-lg ${
+            messageType === 'success' ? 'bg-success text-white border border-success' :
+            messageType === 'error' ? 'bg-error text-white border border-error' :
+            'bg-primary text-white border border-primary'
+          }`}>
             {message}
           </div>
         )}
@@ -118,7 +111,7 @@ const AssistantRegistration = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Nombre del Usuario */}
             <div>
-              <label htmlFor="nombreUsuario" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+              <label htmlFor="nombreUsuario" className="block text-sm font-medium mb-2 text-text-secondary">
                 Nombre Completo
               </label>
               <input
@@ -128,20 +121,14 @@ const AssistantRegistration = () => {
                 value={formData.nombreUsuario}
                 onChange={handleInputChange}
                 placeholder="Ingrese el nombre completo"
-                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
-                style={{
-                  backgroundColor: 'var(--color-highlight)',
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-primary)',
-                  '--tw-ring-color': 'var(--color-primary-light)'
-                }}
+                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
                 required
               />
             </div>
 
             {/* Empresa */}
             <div>
-              <label htmlFor="empresa" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+              <label htmlFor="empresa" className="block text-sm font-medium mb-2 text-text-secondary">
                 Empresa
               </label>
               <input
@@ -151,20 +138,14 @@ const AssistantRegistration = () => {
                 value={formData.empresa}
                 onChange={handleInputChange}
                 placeholder="Ingrese el nombre de la empresa"
-                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
-                style={{
-                  backgroundColor: 'var(--color-highlight)',
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-primary)',
-                  '--tw-ring-color': 'var(--color-primary-light)'
-                }}
+                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
                 required
               />
             </div>
 
             {/* Número de Entradas */}
             <div>
-              <label htmlFor="noEntradas" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+              <label htmlFor="noEntradas" className="block text-sm font-medium mb-2 text-text-secondary">
                 Número de Entradas
               </label>
               <input
@@ -175,13 +156,7 @@ const AssistantRegistration = () => {
                 onChange={handleInputChange}
                 min="1"
                 max="10"
-                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
-                style={{
-                  backgroundColor: 'var(--color-highlight)',
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-primary)',
-                  '--tw-ring-color': 'var(--color-primary-light)'
-                }}
+                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
                 required
               />
             </div>
@@ -189,7 +164,7 @@ const AssistantRegistration = () => {
 
           {/* Evento */}
           <div>
-            <label htmlFor="eventoId" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+            <label htmlFor="eventoId" className="block text-sm font-medium mb-2 text-text-secondary">
               Evento
             </label>
             <select
@@ -197,13 +172,7 @@ const AssistantRegistration = () => {
               name="eventoId"
               value={formData.eventoId}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
-              style={{
-                backgroundColor: 'var(--color-highlight)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text-primary)',
-                '--tw-ring-color': 'var(--color-primary-light)'
-              }}
+              className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
               required
             >
               <option value="">Seleccione un evento</option>
@@ -217,9 +186,9 @@ const AssistantRegistration = () => {
 
           {/* QR Code Preview */}
           {getQRCode() && (
-            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-highlight)', border: '1px solid var(--color-border)' }}>
-              <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>ID del Invitado (QR):</h3>
-              <code className="text-sm p-2 rounded border block" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }}>{getQRCode()}</code>
+            <div className="bg-highlight border border-border p-4 rounded-lg">
+              <h3 className="text-sm font-medium mb-2 text-text-secondary">ID del Invitado (QR):</h3>
+              <code className="text-sm bg-background border border-border p-2 rounded block text-text-primary">{getQRCode()}</code>
             </div>
           )}
 
@@ -228,12 +197,7 @@ const AssistantRegistration = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-3 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ 
-                backgroundColor: 'var(--color-primary)', 
-                color: 'white',
-                '--tw-ring-color': 'var(--color-primary-light)'
-              }}
+              className="px-6 py-3 bg-primary text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center">

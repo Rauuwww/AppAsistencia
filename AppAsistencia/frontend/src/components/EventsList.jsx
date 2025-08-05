@@ -36,53 +36,53 @@ const EventsList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="px-4 py-3 rounded" style={{ backgroundColor: 'var(--color-error)', color: 'white', border: '1px solid var(--color-error)' }}>
+      <div className="bg-error text-white border border-error px-4 py-3 rounded">
         {error}
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+    <div className="bg-surface border border-border rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Eventos</h2>
+        <h2 className="text-2xl font-bold text-text-primary">Eventos</h2>
         <button
           onClick={cargarEventos}
-          className="px-4 py-2 rounded-lg transition-colors"
-          style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+          className="bg-primary text-white px-4 py-2 rounded-lg transition-colors"
         >
           Actualizar
         </button>
       </div>
 
       {eventos.length === 0 ? (
-        <div className="text-center py-8" style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-center py-8 text-text-secondary">
           <p>No hay eventos registrados</p>
         </div>
       ) : (
         <div className="space-y-4">
           {eventos.map((evento) => (
-            <div key={evento.id} className="rounded-lg p-4" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-highlight)' }}>
+            <div key={evento.id} className="border border-border bg-highlight rounded-lg p-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  <h3 className="text-lg font-semibold text-text-primary">
                     {evento.nombre}
                   </h3>
-                  <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                  <p className="mt-1 text-text-secondary">
                     Fecha: {new Date(evento.fecha).toLocaleDateString('es-ES')}
                   </p>
                   <div className="mt-2">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white`}
-                    style={{
-                      backgroundColor: evento.activo ? 'var(--color-success)' : 'var(--color-text-secondary)'
-                    }}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white ${
+                      evento.activo 
+                        ? 'bg-success' 
+                        : 'bg-text-secondary'
+                    }`}>
                       {evento.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </div>
@@ -91,10 +91,9 @@ const EventsList = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => cambiarEstado(evento.id, !evento.activo)}
-                    className="px-3 py-1 text-sm rounded transition-colors text-white"
-                    style={{
-                      backgroundColor: evento.activo ? 'var(--color-error)' : 'var(--color-success)'
-                    }}
+                    className={`px-3 py-1 text-sm rounded transition-colors text-white ${
+                      evento.activo ? 'bg-error' : 'bg-success'
+                    }`}
                   >
                     {evento.activo ? 'Desactivar' : 'Activar'}
                   </button>
