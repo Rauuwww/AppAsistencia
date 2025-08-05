@@ -90,129 +90,185 @@ const AssistantRegistration = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-surface border border-border rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-text-primary">
-          📝 Registro de Asistentes
-        </h2>
-
-        {/* Message Alert */}
-        {message && (
-          <div className={`mb-4 p-4 rounded-lg ${
-            messageType === 'success' ? 'bg-success text-white border border-success' :
-            messageType === 'error' ? 'bg-error text-white border border-error' :
-            'bg-primary text-white border border-primary'
-          }`}>
-            {message}
+    <div className="max-w-5xl mx-auto">
+      {/* Card principal con elevación Material UI */}
+      <div className="bg-surface rounded-xl shadow-xl border border-border overflow-hidden">
+        {/* Header de la card */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary-light/10 px-8 py-6 border-b border-border">
+          <div className="text-center">
+            <h2 className="text-3xl font-semibold mb-2 text-text-primary">
+              📝 Registro de Asistentes
+            </h2>
+            <p className="text-text-secondary font-light">
+              Complete el formulario para registrar un nuevo asistente al evento
+            </p>
           </div>
-        )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Nombre del Usuario */}
-            <div>
-              <label htmlFor="nombreUsuario" className="block text-sm font-medium mb-2 text-text-secondary">
-                Nombre Completo
-              </label>
-              <input
-                type="text"
-                id="nombreUsuario"
-                name="nombreUsuario"
-                value={formData.nombreUsuario}
-                onChange={handleInputChange}
-                placeholder="Ingrese el nombre completo"
-                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
-                required
-              />
-            </div>
-
-            {/* Empresa */}
-            <div>
-              <label htmlFor="empresa" className="block text-sm font-medium mb-2 text-text-secondary">
-                Empresa
-              </label>
-              <input
-                type="text"
-                id="empresa"
-                name="empresa"
-                value={formData.empresa}
-                onChange={handleInputChange}
-                placeholder="Ingrese el nombre de la empresa"
-                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
-                required
-              />
-            </div>
-
-            {/* Número de Entradas */}
-            <div>
-              <label htmlFor="noEntradas" className="block text-sm font-medium mb-2 text-text-secondary">
-                Número de Entradas
-              </label>
-              <input
-                type="number"
-                id="noEntradas"
-                name="noEntradas"
-                value={formData.noEntradas}
-                onChange={handleInputChange}
-                min="1"
-                max="10"
-                className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Evento */}
-          <div>
-            <label htmlFor="eventoId" className="block text-sm font-medium mb-2 text-text-secondary">
-              Evento
-            </label>
-            <select
-              id="eventoId"
-              name="eventoId"
-              value={formData.eventoId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-highlight border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 text-text-primary"
-              required
-            >
-              <option value="">Seleccione un evento</option>
-              {events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.nombre} - {new Date(event.fecha).toLocaleDateString()}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* QR Code Preview */}
-          {getQRCode() && (
-            <div className="bg-highlight border border-border p-4 rounded-lg">
-              <h3 className="text-sm font-medium mb-2 text-text-secondary">ID del Invitado (QR):</h3>
-              <code className="text-sm bg-background border border-border p-2 rounded block text-text-primary">{getQRCode()}</code>
+        {/* Contenido de la card */}
+        <div className="p-8">
+          {/* Mensajes con estilo Material UI */}
+          {message && (
+            <div className={`mb-6 p-4 rounded-lg shadow-sm border-l-4 ${
+              messageType === 'success' ? 'bg-success/10 text-success border-success' :
+              messageType === 'error' ? 'bg-error/10 text-error border-error' :
+              'bg-primary/10 text-primary border-primary'
+            }`}>
+              <div className="flex items-center">
+                <span className="text-lg mr-3">
+                  {messageType === 'success' ? '✓' : messageType === 'error' ? '✕' : 'ℹ'}
+                </span>
+                <span className="font-medium">{message}</span>
+              </div>
             </div>
           )}
 
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-6 py-3 bg-primary text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Campos de información personal */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Nombre del Usuario */}
+              <div className="relative">
+                <label htmlFor="nombreUsuario" className="block text-sm font-medium mb-3 text-text-secondary">
+                  Nombre Completo
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="nombreUsuario"
+                    name="nombreUsuario"
+                    value={formData.nombreUsuario}
+                    onChange={handleInputChange}
+                    placeholder="Ingrese el nombre completo"
+                    className="w-full px-4 py-3 bg-highlight/50 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 focus:border-primary text-text-primary transition-all duration-200 placeholder-text-secondary/50"
+                    required
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Empresa */}
+              <div className="relative">
+                <label htmlFor="empresa" className="block text-sm font-medium mb-3 text-text-secondary">
+                  Empresa
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="empresa"
+                    name="empresa"
+                    value={formData.empresa}
+                    onChange={handleInputChange}
+                    placeholder="Ingrese el nombre de la empresa"
+                    className="w-full px-4 py-3 bg-highlight/50 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 focus:border-primary text-text-primary transition-all duration-200 placeholder-text-secondary/50"
+                    required
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Número de Entradas */}
+              <div className="relative">
+                <label htmlFor="noEntradas" className="block text-sm font-medium mb-3 text-text-secondary">
+                  Número de Entradas
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    id="noEntradas"
+                    name="noEntradas"
+                    value={formData.noEntradas}
+                    onChange={handleInputChange}
+                    min="1"
+                    max="10"
+                    className="w-full px-4 py-3 bg-highlight/50 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 focus:border-primary text-text-primary transition-all duration-200"
+                    required
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Evento */}
+            <div className="relative">
+              <label htmlFor="eventoId" className="block text-sm font-medium mb-3 text-text-secondary">
+                Evento
+              </label>
+              <div className="relative">
+                <select
+                  id="eventoId"
+                  name="eventoId"
+                  value={formData.eventoId}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-highlight/50 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:ring-offset-2 focus:border-primary text-text-primary transition-all duration-200 appearance-none"
+                  required
+                >
+                  <option value="">Seleccione un evento</option>
+                  {events.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.nombre} - {new Date(event.fecha).toLocaleDateString()}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                  Registrando...
-                </span>
-              ) : (
-                'Registrar Asistente'
-              )}
-            </button>
-          </div>
-        </form>
+                </div>
+              </div>
+            </div>
+
+            {/* QR Code Preview con estilo Material UI */}
+            {getQRCode() && (
+              <div className="bg-highlight/30 border border-border rounded-lg p-6">
+                <h3 className="text-lg font-medium mb-3 text-text-primary">ID del Invitado (QR)</h3>
+                <div className="bg-background/50 rounded-lg p-4 border border-border">
+                  <code className="text-sm font-mono text-text-primary break-all">{getQRCode()}</code>
+                </div>
+                <p className="text-sm text-text-secondary mt-3 font-light">
+                  Este ID será generado automáticamente y se puede usar para crear el código QR del asistente.
+                </p>
+              </div>
+            )}
+
+            {/* Botón de envío con estilo Material UI */}
+            <div className="flex justify-center pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="bg-primary text-white py-4 px-8 rounded-lg font-medium transition-all duration-200 hover:bg-primary-light hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center"
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Registrando...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Registrar Asistente</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

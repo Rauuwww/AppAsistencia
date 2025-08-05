@@ -30,31 +30,45 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-text-primary">
-            Sistema de Asistencia QR
-          </h1>
-          <p className="text-text-secondary">
-            Gestión de eventos y control de asistencia mediante códigos QR
-          </p>
+    <div className="min-h-screen bg-background font-sans">
+      {/* Header con elevación Material UI */}
+      <header className="bg-surface border-b border-border shadow-lg">
+        <div className="container mx-auto px-6 py-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-3 text-text-primary font-sans">
+              Sistema de Asistencia QR
+            </h1>
+            <p className="text-lg text-text-secondary font-light">
+              Gestión de eventos y control de asistencia mediante códigos QR
+            </p>
+          </div>
         </div>
+      </header>
 
-        {/* Navigation */}
-        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Navigation con estilo Material UI */}
+      <div className="bg-surface border-b border-border shadow-sm">
+        <div className="container mx-auto px-6">
+          <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
+      </div>
 
-        {/* Content */}
-        <div className="max-w-6xl mx-auto">
+      {/* Main Content con padding y estructura Material UI */}
+      <main className="container mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
+      </main>
 
-        {/* Footer */}
-        <footer className="mt-12 text-center text-sm text-text-secondary">
-          <p>&copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.</p>
-        </footer>
-      </div>
+      {/* Footer con estilo Material UI */}
+      <footer className="bg-surface border-t border-border mt-16">
+        <div className="container mx-auto px-6 py-6">
+          <div className="text-center">
+            <p className="text-sm text-text-secondary font-light">
+              &copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

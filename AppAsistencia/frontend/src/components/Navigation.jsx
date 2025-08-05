@@ -11,24 +11,27 @@ const Navigation = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <nav className="bg-surface border border-border shadow-lg rounded-lg mb-6">
-      <div className="flex flex-wrap sm:flex-nowrap">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center py-3 px-2 sm:px-4 lg:px-6 text-xs sm:text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-highlight text-text-primary border-b-2 border-primary'
-                : 'text-text-secondary hover:text-text-primary hover:bg-highlight'
-            }`}
-          >
-            <span className="mr-1 sm:mr-2 text-sm sm:text-lg">{tab.icon}</span>
-            <span className="hidden sm:inline">{tab.label}</span>
-            <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
-          </button>
-        ))}
-      </div>
+    <nav className="flex flex-wrap sm:flex-nowrap">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          className={`relative flex-1 flex items-center justify-center py-4 px-3 sm:px-6 text-sm font-medium transition-all duration-200 ${
+            activeTab === tab.id
+              ? 'text-primary border-b-2 border-primary bg-highlight/20'
+              : 'text-text-secondary hover:text-text-primary hover:bg-highlight/10'
+          }`}
+        >
+          <span className="mr-2 text-lg">{tab.icon}</span>
+          <span className="hidden sm:inline font-medium">{tab.label}</span>
+          <span className="sm:hidden text-xs font-medium">{tab.label.split(' ')[0]}</span>
+          
+          {/* Indicador Material UI para tab activo */}
+          {activeTab === tab.id && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-sm"></div>
+          )}
+        </button>
+      ))}
     </nav>
   );
 };
