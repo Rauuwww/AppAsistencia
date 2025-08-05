@@ -30,14 +30,14 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Sistema de Asistencia QR
           </h1>
-          <p className="text-gray-600">
+          <p style={{ color: 'var(--color-text-secondary)' }}>
             Gestión de eventos y control de asistencia mediante códigos QR
           </p>
         </div>
@@ -51,7 +51,7 @@ function App() {
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 text-center text-gray-500 text-sm">
+        <footer className="mt-12 text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           <p>&copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.</p>
         </footer>
       </div>

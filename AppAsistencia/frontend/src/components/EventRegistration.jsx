@@ -91,22 +91,29 @@ const EventRegistration = () => {
     }
   };
 
+  const getMessageStyle = (type) => {
+    switch (type) {
+      case 'success':
+        return { backgroundColor: 'var(--color-success)', color: 'white', border: '1px solid var(--color-success)' };
+      case 'error':
+        return { backgroundColor: 'var(--color-error)', color: 'white', border: '1px solid var(--color-error)' };
+      default:
+        return { backgroundColor: 'var(--color-primary)', color: 'white', border: '1px solid var(--color-primary)' };
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulario de Registro */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
             🎪 Registrar Nuevo Evento
           </h2>
 
           {/* Message Alert */}
           {message && (
-            <div className={`mb-4 p-4 rounded-lg ${
-              messageType === 'success' ? 'bg-green-100 text-green-700 border border-green-200' :
-              messageType === 'error' ? 'bg-red-100 text-red-700 border border-red-200' :
-              'bg-blue-100 text-blue-700 border border-blue-200'
-            }`}>
+            <div className="mb-4 p-4 rounded-lg" style={getMessageStyle(messageType)}>
               {message}
             </div>
           )}
@@ -114,7 +121,7 @@ const EventRegistration = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nombre del Evento */}
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="nombre" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                 Nombre del Evento
               </label>
               <input
@@ -124,14 +131,20 @@ const EventRegistration = () => {
                 value={formData.nombre}
                 onChange={handleInputChange}
                 placeholder="Ej: Conferencia Anual de Tecnología"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
+                style={{
+                  backgroundColor: 'var(--color-highlight)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-light)'
+                }}
                 required
               />
             </div>
 
             {/* Fecha del Evento */}
             <div>
-              <label htmlFor="fecha" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fecha" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                 Fecha del Evento
               </label>
               <input
@@ -141,7 +154,13 @@ const EventRegistration = () => {
                 value={formData.fecha}
                 onChange={handleInputChange}
                 min={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
+                style={{
+                  backgroundColor: 'var(--color-highlight)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-light)'
+                }}
                 required
               />
             </div>
@@ -150,7 +169,12 @@ const EventRegistration = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                backgroundColor: 'var(--color-primary)', 
+                color: 'white',
+                '--tw-ring-color': 'var(--color-primary-light)'
+              }}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -168,25 +192,25 @@ const EventRegistration = () => {
         </div>
 
         {/* Lista de Eventos Existentes */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
             📋 Eventos Registrados
           </h2>
 
           {events.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-6xl mb-4">📅</div>
-              <p className="text-gray-500">No hay eventos registrados</p>
-              <p className="text-sm text-gray-400 mt-2">Crea tu primer evento usando el formulario</p>
+              <div className="text-6xl mb-4" style={{ color: 'var(--color-text-secondary)' }}>📅</div>
+              <p style={{ color: 'var(--color-text-secondary)' }}>No hay eventos registrados</p>
+              <p className="text-sm mt-2" style={{ color: 'var(--color-text-secondary)' }}>Crea tu primer evento usando el formulario</p>
             </div>
           ) : (
             <div className="space-y-4">
               {events.map((event) => (
-                <div key={event.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={event.id} className="rounded-lg p-4" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-highlight)' }}>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800">{event.nombre}</h3>
-                      <p className="text-sm text-gray-600">
+                      <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{event.nombre}</h3>
+                      <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                         📅 {new Date(event.fecha).toLocaleDateString('es-ES', {
                           weekday: 'long',
                           year: 'numeric',
@@ -198,18 +222,20 @@ const EventRegistration = () => {
                     <div className="flex items-center space-x-2">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                         event.activo 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                          ? 'text-white' 
+                          : 'text-white'
+                      }`}
+                      style={{
+                        backgroundColor: event.activo ? 'var(--color-success)' : 'var(--color-text-secondary)'
+                      }}>
                         {event.activo ? 'Activo' : 'Inactivo'}
                       </span>
                       <button
                         onClick={() => handleToggleEventStatus(event.id, event.activo)}
-                        className={`px-3 py-1 text-xs font-medium rounded ${
-                          event.activo
-                            ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                            : 'bg-green-100 text-green-700 hover:bg-green-200'
-                        }`}
+                        className="px-3 py-1 text-xs font-medium rounded text-white"
+                        style={{
+                          backgroundColor: event.activo ? 'var(--color-error)' : 'var(--color-success)'
+                        }}
                       >
                         {event.activo ? 'Desactivar' : 'Activar'}
                       </button>

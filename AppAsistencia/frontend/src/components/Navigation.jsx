@@ -11,7 +11,7 @@ const Navigation = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <nav className="bg-white shadow-lg rounded-lg mb-6">
+    <nav className="shadow-lg rounded-lg mb-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
       <div className="flex flex-wrap sm:flex-nowrap">
         {tabs.map((tab) => (
           <button
@@ -19,9 +19,18 @@ const Navigation = ({ activeTab, setActiveTab }) => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex items-center justify-center py-3 px-2 sm:px-4 lg:px-6 text-xs sm:text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'bg-blue-600 text-white border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                ? 'border-b-2'
+                : 'hover:bg-opacity-10'
             }`}
+            style={{
+              backgroundColor: activeTab === tab.id ? 'var(--color-highlight)' : 'transparent',
+              color: activeTab === tab.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              borderColor: activeTab === tab.id ? 'var(--color-primary)' : 'transparent',
+              ':hover': {
+                backgroundColor: activeTab !== tab.id ? 'var(--color-highlight)' : 'var(--color-highlight)',
+                color: 'var(--color-text-primary)'
+              }
+            }}
           >
             <span className="mr-1 sm:mr-2 text-sm sm:text-lg">{tab.icon}</span>
             <span className="hidden sm:inline">{tab.label}</span>
