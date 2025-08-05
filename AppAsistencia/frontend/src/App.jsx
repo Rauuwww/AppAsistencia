@@ -64,56 +64,63 @@ function App() {
     <div className="min-h-screen bg-background font-sans">
       {/* Header con elevación Material UI */}
       <header className="bg-surface border-b border-border shadow-lg">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="text-center flex-1">
-              <h1 className="text-3xl font-bold mb-2 text-text-primary font-sans">
-                Sistema de Asistencia QR
-              </h1>
-              <p className="text-lg text-text-secondary font-light">
-                Gestión de eventos y control de asistencia mediante códigos QR
-              </p>
-            </div>
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          {/* Layout responsive para el header */}
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
             
-            {/* Información del usuario y botón de logout */}
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-text-secondary font-light">Usuario</p>
-                <p className="text-text-primary font-medium">{user}</p>
+            {/* Información del usuario y botón de logout - Móvil arriba, Desktop derecha */}
+            <div className="flex items-center justify-between w-full sm:w-auto sm:order-2">
+              <div className="text-right mr-4 sm:mr-6">
+                <p className="text-xs sm:text-sm text-text-secondary font-light">Usuario</p>
+                <p className="text-sm sm:text-base text-text-primary font-medium">{user}</p>
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-error text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-error/80 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center"
+                className="bg-error text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-medium transition-all duration-200 hover:bg-error/80 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center text-xs sm:text-sm"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                Cerrar Sesión
+                <span className="hidden sm:inline">Cerrar Sesión</span>
+                <span className="sm:hidden">Salir</span>
               </button>
             </div>
+
+            {/* Título principal - Centrado en móvil, izquierda en desktop */}
+            <div className="text-center sm:text-left sm:order-1 sm:flex-1">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-text-primary font-sans">
+                Sistema de Asistencia QR
+              </h1>
+              <p className="text-sm sm:text-base lg:text-lg text-text-secondary font-light">
+                Gestión de eventos y control de asistencia mediante códigos QR
+              </p>
+            </div>
+
+            {/* Espaciador invisible para mantener el centrado en desktop */}
+            <div className="hidden sm:block sm:order-3 sm:w-48"></div>
           </div>
         </div>
       </header>
 
       {/* Navigation con estilo Material UI */}
       <div className="bg-surface border-b border-border shadow-sm">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
 
       {/* Main Content con padding y estructura Material UI */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
       </main>
 
       {/* Footer con estilo Material UI */}
-      <footer className="bg-surface border-t border-border mt-16">
-        <div className="container mx-auto px-6 py-6">
+      <footer className="bg-surface border-t border-border mt-12 sm:mt-16">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="text-center">
-            <p className="text-sm text-text-secondary font-light">
+            <p className="text-xs sm:text-sm text-text-secondary font-light">
               &copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.
             </p>
           </div>
