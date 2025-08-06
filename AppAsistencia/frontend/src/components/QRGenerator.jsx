@@ -121,68 +121,77 @@ const QRGenerator = () => {
     // Generar QR del primer asistente como preview
     const firstAssistant = eventAssistants[0];
     
+    // Calcular altura total según si hay logo o no
+    const logoHeight = qrStyle.image ? 80 : 0;
+    const totalHeight = qrStyle.height + 80 + logoHeight; // QR + texto + logo(si hay)
+    
     // Crear canvas personalizado con texto
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = qrStyle.width;
-    canvas.height = qrStyle.height + 80; // Espacio extra para texto
+    canvas.height = totalHeight;
     
     // Fondo blanco
     ctx.fillStyle = qrStyle.backgroundOptions.color;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    const qrCodeInstance = new QRCodeStyling({
-      ...qrStyle,
-      data: firstAssistant.invitadoId,
-      image: undefined, // Manejaremos la imagen manualmente
-      imageOptions: undefined
-    });
-
-    // Generar QR en div temporal
-    const tempDiv = document.createElement('div');
-    qrCodeInstance.append(tempDiv);
+    // Si hay logo, dibujarlo en el encabezado
+    if (qrStyle.image) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // Calcular tamaño y posición del logo en el encabezado
+        const logoSize = 60; // Tamaño fijo para el encabezado
+        const logoX = (canvas.width - logoSize) / 2;
+        const logoY = 10; // Margen superior
+        
+        // Dibujar el logo en el encabezado
+        ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+        
+        // Generar QR después del logo
+        generateQRAfterLogo();
+      };
+      img.onerror = () => {
+        console.warn('Error cargando logo, continuando sin él');
+        generateQRAfterLogo();
+      };
+      img.src = qrStyle.image;
+    } else {
+      // Si no hay logo, generar QR directamente
+      generateQRAfterLogo();
+    }
     
-    // Esperar a que se genere el QR y luego agregarlo al canvas principal
-    setTimeout(() => {
-      const qrCanvas = tempDiv.querySelector('canvas');
-      if (qrCanvas) {
-        // Dibujar el QR en el canvas principal
-        ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
-        
-        // Si hay logo configurado, dibujarlo en el centro
-        if (qrStyle.image) {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            const logoSize = (qrStyle.width - (qrStyle.margin * 2)) * (qrStyle.imageOptions?.imageSize || 0.3);
-            const logoX = (qrStyle.width - logoSize) / 2;
-            const logoY = qrStyle.margin + ((qrStyle.height - (qrStyle.margin * 2)) - logoSize) / 2;
-            
-            // Fondo blanco para el logo
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10);
-            
-            // Dibujar el logo
-            ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
-            
-            // Agregar texto después de dibujar el logo
-            addTextToPreviewCanvas();
-          };
-          img.onerror = () => {
-            // Si falla la carga del logo, continuar sin él
-            addTextToPreviewCanvas();
-          };
-          img.src = qrStyle.image;
-        } else {
-          // Si no hay logo, agregar texto directamente
-          addTextToPreviewCanvas();
-        }
-        
-        function addTextToPreviewCanvas() {
+    function generateQRAfterLogo() {
+      // Crear configuración QR sin imagen (para evitar conflictos)
+      const qrConfig = {
+        ...qrStyle,
+        image: undefined,
+        imageOptions: undefined
+      };
+      
+      const qrCodeInstance = new QRCodeStyling({
+        ...qrConfig,
+        data: firstAssistant.invitadoId
+      });
+
+      // Generar QR en div temporal
+      const tempDiv = document.createElement('div');
+      qrCodeInstance.append(tempDiv);
+      
+      // Esperar a que se genere el QR y luego agregarlo al canvas principal
+      setTimeout(() => {
+        const qrCanvas = tempDiv.querySelector('canvas');
+        if (qrCanvas) {
+          // Calcular posición Y del QR (después del logo si existe)
+          const qrY = qrStyle.image ? logoHeight + 10 : qrStyle.margin;
+          
+          // Dibujar el QR en el canvas principal
+          ctx.drawImage(qrCanvas, qrStyle.margin, qrY, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+          
           // Agregar texto debajo del QR
+          const textY = qrY + qrStyle.height - qrStyle.margin + 20;
           ctx.textAlign = 'center';
           const centerX = canvas.width / 2;
-          const textY = qrStyle.height + 20;
           
           // Nombre del usuario
           ctx.font = 'bold 16px Arial, sans-serif';
@@ -200,8 +209,8 @@ const QRGenerator = () => {
           
           setPreviewQR({ canvas });
         }
-      }
-    }, 100);
+      }, 100);
+    }
   };
 
   const generateAllQRs = async (format) => {
@@ -223,16 +232,43 @@ const QRGenerator = () => {
         
         if (format === 'png') {
           // Para PNG, crear canvas personalizado con texto y logo
+          // Calcular altura total según si hay logo o no
+          const logoHeight = qrStyle.image ? 80 : 0;
+          const totalHeight = qrStyle.height + 80 + logoHeight; // QR + texto + logo(si hay)
+          
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           canvas.width = qrStyle.width;
-          canvas.height = qrStyle.height + 80; // Espacio extra para texto
+          canvas.height = totalHeight;
           
           // Fondo blanco
           ctx.fillStyle = qrStyle.backgroundOptions.color;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          // Crear QR temporal sin imagen (la manejaremos manualmente)
+          // Si hay logo, dibujarlo en el encabezado primero
+          if (qrStyle.image) {
+            await new Promise((logoResolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                // Calcular tamaño y posición del logo en el encabezado
+                const logoSize = 60; // Tamaño fijo para el encabezado
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = 10; // Margen superior
+                
+                // Dibujar el logo en el encabezado
+                ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+                logoResolve();
+              };
+              img.onerror = () => {
+                console.warn('Error cargando logo, continuando sin él');
+                logoResolve();
+              };
+              img.src = qrStyle.image;
+            });
+          }
+          
+          // Crear QR temporal sin imagen (para evitar conflictos)
           const qrCodeInstance = new QRCodeStyling({
             ...qrStyle,
             data: assistant.invitadoId,
@@ -246,42 +282,19 @@ const QRGenerator = () => {
           
           // Esperar a que se genere el QR
           await new Promise((resolve) => {
-            setTimeout(async () => {
+            setTimeout(() => {
               const qrCanvas = tempDiv.querySelector('canvas');
               if (qrCanvas) {
-                // Dibujar el QR en el canvas principal
-                ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+                // Calcular posición Y del QR (después del logo si existe)
+                const qrY = qrStyle.image ? logoHeight + 10 : qrStyle.margin;
                 
-                // Si hay logo, dibujarlo
-                if (qrStyle.image) {
-                  await new Promise((logoResolve) => {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.onload = () => {
-                      const logoSize = (qrStyle.width - (qrStyle.margin * 2)) * (qrStyle.imageOptions?.imageSize || 0.3);
-                      const logoX = (qrStyle.width - logoSize) / 2;
-                      const logoY = qrStyle.margin + ((qrStyle.height - (qrStyle.margin * 2)) - logoSize) / 2;
-                      
-                      // Fondo blanco para el logo
-                      ctx.fillStyle = '#ffffff';
-                      ctx.fillRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10);
-                      
-                      // Dibujar el logo
-                      ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
-                      logoResolve();
-                    };
-                    img.onerror = () => {
-                      console.warn('Error cargando logo, continuando sin él');
-                      logoResolve(); // Continuar si falla el logo
-                    };
-                    img.src = qrStyle.image;
-                  });
-                }
+                // Dibujar el QR en el canvas principal
+                ctx.drawImage(qrCanvas, qrStyle.margin, qrY, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
                 
                 // Agregar texto debajo del QR
+                const textY = qrY + qrStyle.height - qrStyle.margin + 20;
                 ctx.textAlign = 'center';
                 const centerX = canvas.width / 2;
-                const textY = qrStyle.height + 20;
                 
                 // Nombre del usuario
                 ctx.font = 'bold 16px Arial, sans-serif';
@@ -303,10 +316,12 @@ const QRGenerator = () => {
           zip.file(fileName, blob);
           
         } else {
-          // Para SVG, usar qr-code-styling directamente (con logo si está configurado)
+          // Para SVG, usar qr-code-styling directamente (sin logo para evitar conflictos)
           const qrCodeInstance = new QRCodeStyling({
             ...qrStyle,
-            data: assistant.invitadoId
+            data: assistant.invitadoId,
+            image: undefined,
+            imageOptions: undefined
           });
 
           const qrData = await new Promise((resolve) => {
@@ -480,7 +495,7 @@ const QRGenerator = () => {
                           alt="Logo" 
                           className="w-4 h-4 object-contain bg-white rounded mr-2"
                         />
-                        <span>{Math.round((qrStyle.imageOptions?.imageSize || 0.3) * 100)}%</span>
+                        <span>Encabezado</span>
                       </div>
                     </div>
                   )}

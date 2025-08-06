@@ -58,74 +58,86 @@ const AssistantRegistration = () => {
 
   useEffect(() => {
     if (showQRModal && lastQRData && qrRef.current) {
+      // Calcular altura total según si hay logo o no
+      const logoHeight = qrStyle.image ? 80 : 0;
+      const totalHeight = qrStyle.height + 80 + logoHeight; // QR + texto + logo(si hay)
+      
       // Generar el QR solo cuando se muestra el modal
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = qrStyle.width;
-      canvas.height = qrStyle.height + 80; // Espacio extra para texto
+      canvas.height = totalHeight;
       
       // Fondo blanco
       ctx.fillStyle = qrStyle.backgroundOptions.color;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      const qr = new QRCodeStyling({
-        ...qrStyle,
-        data: lastQRData.invitadoId
-      });
-      
-      // Generar QR en canvas temporal
-      const tempDiv = document.createElement('div');
-      qr.append(tempDiv);
-      
-      // Esperar a que se genere el QR y luego agregarlo al canvas principal
-      setTimeout(() => {
-        const qrCanvas = tempDiv.querySelector('canvas');
-        if (qrCanvas) {
-          // Dibujar el QR en el canvas principal (posición superior)
-          ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+      // Si hay logo, dibujarlo en el encabezado
+      if (qrStyle.image) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          // Calcular tamaño y posición del logo en el encabezado
+          const logoSize = 60; // Tamaño fijo para el encabezado
+          const logoX = (canvas.width - logoSize) / 2;
+          const logoY = 10; // Margen superior
           
-          // Si hay logo configurado, dibujarlo en el centro
-          if (qrStyle.image) {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-              const logoSize = (qrStyle.width - (qrStyle.margin * 2)) * (qrStyle.imageOptions?.imageSize || 0.3);
-              const logoX = (qrStyle.width - logoSize) / 2;
-              const logoY = qrStyle.margin + ((qrStyle.height - (qrStyle.margin * 2)) - logoSize) / 2;
-              
-              // Fondo blanco para el logo
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10);
-              
-              // Dibujar el logo
-              ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
-              
-              // Agregar texto debajo del QR después de dibujar el logo
-              addTextToCanvas();
-            };
-            img.onerror = () => {
-              console.warn('Error cargando logo, continuando sin él');
-              addTextToCanvas(); // Continuar sin logo si falla
-            };
-            img.src = qrStyle.image;
-          } else {
-            // Si no hay logo, agregar texto directamente
-            addTextToCanvas();
-          }
+          // Dibujar el logo en el encabezado
+          ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
           
-          function addTextToCanvas() {
+          // Generar QR después del logo
+          generateQRAfterLogo();
+        };
+        img.onerror = () => {
+          console.warn('Error cargando logo, continuando sin él');
+          generateQRAfterLogo();
+        };
+        img.src = qrStyle.image;
+      } else {
+        // Si no hay logo, generar QR directamente
+        generateQRAfterLogo();
+      }
+      
+      function generateQRAfterLogo() {
+        // Crear configuración QR sin imagen (para evitar conflictos)
+        const qrConfig = {
+          ...qrStyle,
+          image: undefined,
+          imageOptions: undefined
+        };
+        
+        const qr = new QRCodeStyling({
+          ...qrConfig,
+          data: lastQRData.invitadoId
+        });
+        
+        // Generar QR en canvas temporal
+        const tempDiv = document.createElement('div');
+        qr.append(tempDiv);
+        
+        // Esperar a que se genere el QR y luego agregarlo al canvas principal
+        setTimeout(() => {
+          const qrCanvas = tempDiv.querySelector('canvas');
+          if (qrCanvas) {
+            // Calcular posición Y del QR (después del logo si existe)
+            const qrY = qrStyle.image ? logoHeight + 10 : qrStyle.margin;
+            
+            // Dibujar el QR en el canvas principal
+            ctx.drawImage(qrCanvas, qrStyle.margin, qrY, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+            
             // Agregar texto debajo del QR
+            const textY = qrY + qrStyle.height - qrStyle.margin + 20;
             ctx.textAlign = 'center';
             ctx.fillStyle = '#1E1E2E';
             
             // Nombre del usuario
             ctx.font = 'bold 16px Arial, sans-serif';
-            ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, qrStyle.height + 20);
+            ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, textY);
             
             // Empresa
             ctx.font = '14px Arial, sans-serif';
             ctx.fillStyle = qrStyle.dotsOptions.color;
-            ctx.fillText(lastQRData.empresa, canvas.width / 2, qrStyle.height + 45);
+            ctx.fillText(lastQRData.empresa, canvas.width / 2, textY + 25);
             
             // Limpiar el contenedor y agregar el canvas final
             qrRef.current.innerHTML = '';
@@ -134,8 +146,8 @@ const AssistantRegistration = () => {
             // Guardar referencia para descarga
             qrInstance.current = { canvas };
           }
-        }
-      }, 100);
+        }, 100);
+      }
     }
   }, [showQRModal, lastQRData, qrStyle]);
 

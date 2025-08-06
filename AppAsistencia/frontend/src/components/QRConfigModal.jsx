@@ -71,16 +71,6 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
     });
   };
 
-  const updateImageSize = (size) => {
-    setQrStyle(prev => ({
-      ...prev,
-      imageOptions: {
-        ...prev.imageOptions,
-        imageSize: size
-      }
-    }));
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -143,23 +133,8 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
                     />
                     <div className="flex-1">
                       <p className="text-sm text-text-primary font-medium">Logo de empresa</p>
-                      <p className="text-xs text-text-secondary">Se mostrará en el centro del QR</p>
+                      <p className="text-xs text-text-secondary">Se mostrará en el encabezado de la imagen</p>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs text-text-secondary mb-2">
-                      Tamaño del logo: {Math.round((qrStyle.imageOptions?.imageSize || 0.3) * 100)}%
-                    </label>
-                    <input
-                      type="range"
-                      min="0.2"
-                      max="0.5"
-                      step="0.05"
-                      value={qrStyle.imageOptions?.imageSize || 0.3}
-                      onChange={(e) => updateImageSize(parseFloat(e.target.value))}
-                      className="w-full accent-primary"
-                    />
                   </div>
                 </div>
               )}
