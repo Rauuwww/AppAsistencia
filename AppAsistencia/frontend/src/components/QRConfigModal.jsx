@@ -43,6 +43,29 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
     }));
   };
 
+  const toggleLogo = () => {
+    setQrStyle(prev => ({
+      ...prev,
+      imageOptions: prev.imageOptions?.hideBackgroundDots ? undefined : {
+        hideBackgroundDots: true,
+        imageSize: 0.3,
+        margin: 10,
+        crossOrigin: 'anonymous'
+      },
+      image: prev.imageOptions?.hideBackgroundDots ? undefined : 'https://i.imgur.com/g4hAfqU.png'
+    }));
+  };
+
+  const updateImageSize = (size) => {
+    setQrStyle(prev => ({
+      ...prev,
+      imageOptions: {
+        ...prev.imageOptions,
+        imageSize: size
+      }
+    }));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -75,6 +98,58 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
         {/* Contenido del modal */}
         <div className="p-6 max-h-96 overflow-y-auto">
           <div className="space-y-6">
+            {/* Logo de Empresa */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-text-secondary">
+                  Logo de Empresa
+                </label>
+                <button
+                  onClick={toggleLogo}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+                    qrStyle.image ? 'bg-primary' : 'bg-highlight'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      qrStyle.image ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {qrStyle.image && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 p-3 bg-highlight/30 rounded-lg">
+                    <img 
+                      src={qrStyle.image} 
+                      alt="Logo empresa" 
+                      className="w-8 h-8 object-contain bg-white rounded"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm text-text-primary font-medium">Logo de empresa</p>
+                      <p className="text-xs text-text-secondary">Se mostrará en el centro del QR</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs text-text-secondary mb-2">
+                      Tamaño del logo: {Math.round((qrStyle.imageOptions?.imageSize || 0.3) * 100)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0.2"
+                      max="0.5"
+                      step="0.05"
+                      value={qrStyle.imageOptions?.imageSize || 0.3}
+                      onChange={(e) => updateImageSize(parseFloat(e.target.value))}
+                      className="w-full accent-primary"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Estilos Predefinidos */}
             <div>
               <label className="block text-sm font-medium mb-3 text-text-secondary">

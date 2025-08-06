@@ -66,25 +66,52 @@ const AssistantRegistration = () => {
           // Dibujar el QR en el canvas principal (posición superior)
           ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
           
-          // Agregar texto debajo del QR
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#1E1E2E';
+          // Si hay logo configurado, dibujarlo en el centro
+          if (qrStyle.image) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              const logoSize = (qrStyle.width - (qrStyle.margin * 2)) * (qrStyle.imageOptions?.imageSize || 0.3);
+              const logoX = (qrStyle.width - logoSize) / 2;
+              const logoY = qrStyle.margin + ((qrStyle.height - (qrStyle.margin * 2)) - logoSize) / 2;
+              
+              // Fondo blanco para el logo
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10);
+              
+              // Dibujar el logo
+              ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+              
+              // Agregar texto debajo del QR después de dibujar el logo
+              addTextToCanvas();
+            };
+            img.src = qrStyle.image;
+          } else {
+            // Si no hay logo, agregar texto directamente
+            addTextToCanvas();
+          }
           
-          // Nombre del usuario
-          ctx.font = 'bold 16px Arial, sans-serif';
-          ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, qrStyle.height + 20);
-          
-          // Empresa
-          ctx.font = '14px Arial, sans-serif';
-          ctx.fillStyle = qrStyle.dotsOptions.color;
-          ctx.fillText(lastQRData.empresa, canvas.width / 2, qrStyle.height + 45);
-          
-          // Limpiar el contenedor y agregar el canvas final
-          qrRef.current.innerHTML = '';
-          qrRef.current.appendChild(canvas);
-          
-          // Guardar referencia para descarga
-          qrInstance.current = { canvas };
+          function addTextToCanvas() {
+            // Agregar texto debajo del QR
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#1E1E2E';
+            
+            // Nombre del usuario
+            ctx.font = 'bold 16px Arial, sans-serif';
+            ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, qrStyle.height + 20);
+            
+            // Empresa
+            ctx.font = '14px Arial, sans-serif';
+            ctx.fillStyle = qrStyle.dotsOptions.color;
+            ctx.fillText(lastQRData.empresa, canvas.width / 2, qrStyle.height + 45);
+            
+            // Limpiar el contenedor y agregar el canvas final
+            qrRef.current.innerHTML = '';
+            qrRef.current.appendChild(canvas);
+            
+            // Guardar referencia para descarga
+            qrInstance.current = { canvas };
+          }
         }
       }, 100);
     }
@@ -345,7 +372,18 @@ const AssistantRegistration = () => {
                       className="w-4 h-4 rounded-full mr-2" 
                       style={{ backgroundColor: qrStyle.dotsOptions.color }}
                     ></div>
-                    Estilo: {qrStyle.dotsOptions.type} • {qrStyle.width}px
+                    <span>Estilo: {qrStyle.dotsOptions.type} • {qrStyle.width}px</span>
+                    {qrStyle.image && (
+                      <>
+                        <span className="mx-1">•</span>
+                        <img 
+                          src={qrStyle.image} 
+                          alt="Logo" 
+                          className="w-3 h-3 object-contain bg-white rounded mr-1"
+                        />
+                        <span>Logo</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="bg-background/50 rounded-lg p-4 border border-border">
@@ -358,7 +396,7 @@ const AssistantRegistration = () => {
                     onClick={() => setShowConfigModal(true)}
                     className="text-primary hover:text-primary-light ml-2 underline"
                   >
-                    Personalizar estilo
+                    Personalizar estilo{qrStyle.image ? ' y logo' : ''}
                   </button>
                 </p>
               </div>
