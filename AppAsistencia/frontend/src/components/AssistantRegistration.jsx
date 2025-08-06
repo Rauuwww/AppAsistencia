@@ -53,7 +53,7 @@ const AssistantRegistration = () => {
   useEffect(() => {
     if (showQRModal && lastQRData && qrRef.current) {
       // Calcular altura total según si hay logo o no
-      const logoHeight = qrStyle.image ? 80 : 0;
+      const logoHeight = qrStyle.image ? 210 : 0; // Aumentado para acomodar el logo más grande
       const totalHeight = qrStyle.height + 80 + logoHeight; // QR + texto + logo(si hay)
       
       // Generar el QR solo cuando se muestra el modal
@@ -72,12 +72,37 @@ const AssistantRegistration = () => {
         img.crossOrigin = 'anonymous';
         img.onload = () => {
           // Calcular tamaño y posición del logo en el encabezado
-          const logoSize = 60; // Tamaño fijo para el encabezado
-          const logoX = (canvas.width - logoSize) / 2;
-          const logoY = 10; // Margen superior
+          const logoSizeH = 180; // Alto del logo
+          const logoSizeW = 210; // Ancho del logo
+          const logoX = (canvas.width - logoSizeW) / 2;
+          const logoY = 15; // Margen superior
           
-          // Dibujar el logo en el encabezado
-          ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+          // Configurar el contexto para mejor calidad de renderizado
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          
+          // Crear un canvas temporal de alta resolución para el logo
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          
+          // Escalar el canvas temporal para mejor calidad (2x)
+          const scale = 2;
+          tempCanvas.width = logoSizeW * scale;
+          tempCanvas.height = logoSizeH * scale;
+          
+          // Configurar alta calidad en el canvas temporal
+          tempCtx.imageSmoothingEnabled = true;
+          tempCtx.imageSmoothingQuality = 'high';
+          
+          // Dibujar la imagen en el canvas temporal con escala alta
+          tempCtx.drawImage(img, 0, 0, logoSizeW * scale, logoSizeH * scale);
+          
+          // Dibujar el canvas temporal escalado en el canvas principal
+          ctx.drawImage(tempCanvas, logoX, logoY, logoSizeW, logoSizeH);
+          
+          // Restaurar configuración por defecto
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'medium';
           
           // Generar QR después del logo
           generateQRAfterLogo();
@@ -86,7 +111,8 @@ const AssistantRegistration = () => {
           console.warn('Error cargando logo, continuando sin él');
           generateQRAfterLogo();
         };
-        img.src = qrStyle.image;
+        // Usar la nueva imagen de mayor calidad
+        img.src = 'https://i.imgur.com/8e4rzZJ.png';
       } else {
         // Si no hay logo, generar QR directamente
         generateQRAfterLogo();

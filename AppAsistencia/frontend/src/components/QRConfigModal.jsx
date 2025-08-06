@@ -46,7 +46,7 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
   const toggleLogo = () => {
     setQrStyle(prev => ({
       ...prev,
-      image: prev.image ? undefined : 'https://i.imgur.com/g4hAfqU.png'
+      image: prev.image ? undefined : 'https://i.imgur.com/8e4rzZJ.png'
     }));
   };
 
