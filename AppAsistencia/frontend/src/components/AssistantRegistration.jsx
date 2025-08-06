@@ -41,12 +41,6 @@ const AssistantRegistration = () => {
       mode: 'Byte',
       errorCorrectionLevel: 'M'
     },
-    imageOptions: {
-      hideBackgroundDots: true,
-      imageSize: 0.3,
-      margin: 10,
-      crossOrigin: 'anonymous'
-    },
     image: undefined
   });
   const qrRef = useRef(null);
@@ -99,11 +93,16 @@ const AssistantRegistration = () => {
       }
       
       function generateQRAfterLogo() {
-        // Crear configuración QR sin imagen (para evitar conflictos)
+        // Crear configuración QR completamente limpia sin ninguna referencia a imagen
         const qrConfig = {
-          ...qrStyle,
-          image: undefined,
-          imageOptions: undefined
+          width: qrStyle.width,
+          height: qrStyle.height,
+          margin: qrStyle.margin,
+          dotsOptions: qrStyle.dotsOptions,
+          backgroundOptions: qrStyle.backgroundOptions,
+          cornersSquareOptions: qrStyle.cornersSquareOptions,
+          cornersDotOptions: qrStyle.cornersDotOptions,
+          qrOptions: qrStyle.qrOptions
         };
         
         const qr = new QRCodeStyling({
