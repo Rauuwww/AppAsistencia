@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { asistenciasAPI, eventosAPI } from '../services/api';
 import QRCodeStyling from 'qr-code-styling';
+import QRConfigModal from './QRConfigModal';
 
 const AssistantRegistration = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,22 @@ const AssistantRegistration = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
   const [lastQRData, setLastQRData] = useState(null); // { invitadoId, nombreUsuario, empresa }
+  const [qrStyle, setQrStyle] = useState({
+    width: 300,
+    height: 350,
+    margin: 15,
+    dotsOptions: { color: '#4F9EFF', type: 'rounded' },
+    backgroundOptions: { color: '#fff' },
+    cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
+    cornersDotOptions: { color: '#4F9EFF', type: 'dot' },
+    qrOptions: { 
+      typeNumber: 0,
+      mode: 'Byte',
+      errorCorrectionLevel: 'M'
+    }
+  });
   const qrRef = useRef(null);
   const qrInstance = useRef(null);
 
@@ -25,31 +41,19 @@ const AssistantRegistration = () => {
   useEffect(() => {
     if (showQRModal && lastQRData && qrRef.current) {
       // Generar el QR solo cuando se muestra el modal
-      const qr = new QRCodeStyling({
-        width: 300,
-        height: 350, // Aumentamos altura para incluir texto
-        margin: 15,
-        data: lastQRData.invitadoId,
-        dotsOptions: { color: '#4F9EFF', type: 'rounded' },
-        backgroundOptions: { color: '#fff' },
-        cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
-        cornersDotOptions: { color: '#4F9EFF', type: 'dot' },
-        qrOptions: { 
-          typeNumber: 0,
-          mode: 'Byte',
-          errorCorrectionLevel: 'M'
-        }
-      });
-      
-      // Crear canvas personalizado con texto
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      canvas.width = 300;
-      canvas.height = 350;
+      canvas.width = qrStyle.width;
+      canvas.height = qrStyle.height + 80; // Espacio extra para texto
       
       // Fondo blanco
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = qrStyle.backgroundOptions.color;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const qr = new QRCodeStyling({
+        ...qrStyle,
+        data: lastQRData.invitadoId
+      });
       
       // Generar QR en canvas temporal
       const tempDiv = document.createElement('div');
@@ -60,7 +64,7 @@ const AssistantRegistration = () => {
         const qrCanvas = tempDiv.querySelector('canvas');
         if (qrCanvas) {
           // Dibujar el QR en el canvas principal (posición superior)
-          ctx.drawImage(qrCanvas, 15, 15, 270, 270);
+          ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
           
           // Agregar texto debajo del QR
           ctx.textAlign = 'center';
@@ -68,12 +72,12 @@ const AssistantRegistration = () => {
           
           // Nombre del usuario
           ctx.font = 'bold 16px Arial, sans-serif';
-          ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, 310);
+          ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, qrStyle.height + 20);
           
           // Empresa
           ctx.font = '14px Arial, sans-serif';
-          ctx.fillStyle = '#4F9EFF';
-          ctx.fillText(lastQRData.empresa, canvas.width / 2, 330);
+          ctx.fillStyle = qrStyle.dotsOptions.color;
+          ctx.fillText(lastQRData.empresa, canvas.width / 2, qrStyle.height + 45);
           
           // Limpiar el contenedor y agregar el canvas final
           qrRef.current.innerHTML = '';
@@ -84,7 +88,7 @@ const AssistantRegistration = () => {
         }
       }, 100);
     }
-  }, [showQRModal, lastQRData]);
+  }, [showQRModal, lastQRData, qrStyle]);
 
   const loadEvents = async () => {
     try {
@@ -185,13 +189,25 @@ const AssistantRegistration = () => {
       <div className="bg-surface rounded-xl shadow-xl border border-border overflow-hidden">
         {/* Header de la card */}
         <div className="bg-gradient-to-r from-primary/10 to-primary-light/10 px-8 py-6 border-b border-border">
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold mb-2 text-text-primary">
-              📝 Registro de Asistentes
-            </h2>
-            <p className="text-text-secondary font-light">
-              Complete el formulario para registrar un nuevo asistente al evento
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="text-center flex-1">
+              <h2 className="text-3xl font-semibold mb-2 text-text-primary">
+                📝 Registro de Asistentes
+              </h2>
+              <p className="text-text-secondary font-light">
+                Complete el formulario para registrar un nuevo asistente al evento
+              </p>
+            </div>
+            {/* Botón de configuración QR */}
+            <button
+              onClick={() => setShowConfigModal(true)}
+              className="bg-highlight/50 border border-border text-text-primary p-3 rounded-lg font-medium transition-all duration-200 hover:bg-highlight hover:border-primary transform hover:-translate-y-0.5"
+              title="Configurar QR"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -322,12 +338,28 @@ const AssistantRegistration = () => {
             {/* QR Code Preview con estilo Material UI */}
             {getQRCode() && (
               <div className="bg-highlight/30 border border-border rounded-lg p-6">
-                <h3 className="text-lg font-medium mb-3 text-text-primary">ID del Invitado (QR)</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-medium text-text-primary">ID del Invitado (QR)</h3>
+                  <div className="flex items-center text-xs text-text-secondary">
+                    <div 
+                      className="w-4 h-4 rounded-full mr-2" 
+                      style={{ backgroundColor: qrStyle.dotsOptions.color }}
+                    ></div>
+                    Estilo: {qrStyle.dotsOptions.type} • {qrStyle.width}px
+                  </div>
+                </div>
                 <div className="bg-background/50 rounded-lg p-4 border border-border">
                   <code className="text-sm font-mono text-text-primary break-all">{getQRCode()}</code>
                 </div>
                 <p className="text-sm text-text-secondary mt-3 font-light">
                   Este ID será generado automáticamente y se puede usar para crear el código QR del asistente.
+                  <button 
+                    type="button"
+                    onClick={() => setShowConfigModal(true)}
+                    className="text-primary hover:text-primary-light ml-2 underline"
+                  >
+                    Personalizar estilo
+                  </button>
                 </p>
               </div>
             )}
@@ -384,7 +416,7 @@ const AssistantRegistration = () => {
                 <div className="flex flex-col items-center">
                   <div ref={qrRef} className="mb-4"></div>
                   <p className="text-xs text-text-secondary text-center">
-                    QR incluye nombre del usuario y empresa
+                    QR personalizado con información de empresa
                   </p>
                 </div>
               </div>
@@ -396,7 +428,7 @@ const AssistantRegistration = () => {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Descargar QR con Información
+                  Descargar QR Personalizado
                 </button>
                 <button
                   onClick={() => setShowQRModal(false)}
@@ -409,6 +441,14 @@ const AssistantRegistration = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de configuración QR */}
+      <QRConfigModal 
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+        qrStyle={qrStyle}
+        setQrStyle={setQrStyle}
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { asistenciasAPI, eventosAPI } from '../services/api';
 import QRCodeStyling from 'qr-code-styling';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import QRConfigModal from './QRConfigModal';
 
 const QRGenerator = () => {
   const [events, setEvents] = useState([]);
@@ -14,6 +15,7 @@ const QRGenerator = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [previewQR, setPreviewQR] = useState(null);
+  const [showConfigModal, setShowConfigModal] = useState(false);
   const [qrStyle, setQrStyle] = useState({
     width: 300,
     height: 300,
@@ -276,71 +278,31 @@ const QRGenerator = () => {
     }
   };
 
-  const handleStyleChange = (category, property, value) => {
-    setQrStyle(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [property]: value
-      }
-    }));
-  };
-
-  const presetStyles = [
-    {
-      name: 'Clásico Azul',
-      style: {
-        dotsOptions: { color: '#4F9EFF', type: 'rounded' },
-        cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
-        cornersDotOptions: { color: '#4F9EFF', type: 'dot' }
-      }
-    },
-    {
-      name: 'Verde Moderno',
-      style: {
-        dotsOptions: { color: '#50D2A0', type: 'square' },
-        cornersSquareOptions: { color: '#50D2A0', type: 'square' },
-        cornersDotOptions: { color: '#50D2A0', type: 'square' }
-      }
-    },
-    {
-      name: 'Púrpura Elegante',
-      style: {
-        dotsOptions: { color: '#84B9FF', type: 'dots' },
-        cornersSquareOptions: { color: '#84B9FF', type: 'dot' },
-        cornersDotOptions: { color: '#84B9FF', type: 'dot' }
-      }
-    },
-    {
-      name: 'Rojo Corporativo',
-      style: {
-        dotsOptions: { color: '#FF6B6B', type: 'classy-rounded' },
-        cornersSquareOptions: { color: '#FF6B6B', type: 'extra-rounded' },
-        cornersDotOptions: { color: '#FF6B6B', type: 'dot' }
-      }
-    }
-  ];
-
-  const applyPreset = (preset) => {
-    setQrStyle(prev => ({
-      ...prev,
-      ...preset.style
-    }));
-  };
-
   return (
     <div className="max-w-7xl mx-auto">
       {/* Card principal con elevación Material UI */}
       <div className="bg-surface rounded-xl shadow-xl border border-border overflow-hidden">
         {/* Header de la card */}
         <div className="bg-gradient-to-r from-primary/10 to-primary-light/10 px-8 py-6 border-b border-border">
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold mb-2 text-text-primary">
-              🎨 Generador de Códigos QR
-            </h2>
-            <p className="text-text-secondary font-light">
-              Genera códigos QR personalizados para todos los asistentes de un evento
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="text-center flex-1">
+              <h2 className="text-3xl font-semibold mb-2 text-text-primary">
+                🎨 Generador de Códigos QR
+              </h2>
+              <p className="text-text-secondary font-light">
+                Genera códigos QR personalizados para todos los asistentes de un evento
+              </p>
+            </div>
+            {/* Botón de configuración QR */}
+            <button
+              onClick={() => setShowConfigModal(true)}
+              className="bg-highlight/50 border border-border text-text-primary p-3 rounded-lg font-medium transition-all duration-200 hover:bg-highlight hover:border-primary transform hover:-translate-y-0.5"
+              title="Configurar QR"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -421,76 +383,37 @@ const QRGenerator = () => {
                 )}
               </div>
 
-              {/* Estilos Predefinidos */}
+              {/* Información de configuración actual */}
               <div className="bg-highlight/30 rounded-lg p-6">
-                <label className="block text-sm font-medium mb-3 text-text-secondary">
-                  Estilos Predefinidos
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {presetStyles.map((preset) => (
-                    <button
-                      key={preset.name}
-                      onClick={() => applyPreset(preset)}
-                      className="px-4 py-3 text-sm bg-highlight/50 border border-border rounded-lg hover:bg-highlight hover:border-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-light text-text-primary font-medium"
-                    >
-                      {preset.name}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-text-secondary">Configuración Actual</h3>
+                  <button
+                    onClick={() => setShowConfigModal(true)}
+                    className="text-primary hover:text-primary-light text-sm underline"
+                  >
+                    Personalizar
+                  </button>
                 </div>
-              </div>
-
-              {/* Configuración de Tamaño */}
-              <div className="bg-highlight/30 rounded-lg p-6">
-                <label className="block text-sm font-medium mb-3 text-text-secondary">
-                  Tamaño del QR
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-text-secondary mb-2">Ancho</label>
-                    <input
-                      type="range"
-                      min="200"
-                      max="500"
-                      value={qrStyle.width}
-                      onChange={(e) => setQrStyle(prev => ({ ...prev, width: parseInt(e.target.value), height: parseInt(e.target.value) }))}
-                      className="w-full accent-primary"
-                    />
-                    <span className="text-xs text-text-secondary">{qrStyle.width}px</span>
+                <div className="space-y-2 text-sm text-text-secondary">
+                  <div className="flex items-center justify-between">
+                    <span>Tamaño:</span>
+                    <span>{qrStyle.width}x{qrStyle.height}px</span>
                   </div>
-                  <div>
-                    <label className="block text-xs text-text-secondary mb-2">Margen</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="50"
-                      value={qrStyle.margin}
-                      onChange={(e) => setQrStyle(prev => ({ ...prev, margin: parseInt(e.target.value) }))}
-                      className="w-full accent-primary"
-                    />
-                    <span className="text-xs text-text-secondary">{qrStyle.margin}px</span>
+                  <div className="flex items-center justify-between">
+                    <span>Estilo:</span>
+                    <div className="flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: qrStyle.dotsOptions.color }}
+                      ></div>
+                      <span>{qrStyle.dotsOptions.type}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Margen:</span>
+                    <span>{qrStyle.margin}px</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Configuración de Color */}
-              <div className="bg-highlight/30 rounded-lg p-6">
-                <label className="block text-sm font-medium mb-3 text-text-secondary">
-                  Color Principal
-                </label>
-                <input
-                  type="color"
-                  value={qrStyle.dotsOptions.color}
-                  onChange={(e) => {
-                    const color = e.target.value;
-                    setQrStyle(prev => ({
-                      ...prev,
-                      dotsOptions: { ...prev.dotsOptions, color },
-                      cornersSquareOptions: { ...prev.cornersSquareOptions, color },
-                      cornersDotOptions: { ...prev.cornersDotOptions, color }
-                    }));
-                  }}
-                  className="w-full h-12 border border-border rounded-lg cursor-pointer bg-highlight/50"
-                />
               </div>
 
               {/* Botones de Generación en Lote */}
@@ -618,6 +541,14 @@ const QRGenerator = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de configuración QR */}
+      <QRConfigModal 
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+        qrStyle={qrStyle}
+        setQrStyle={setQrStyle}
+      />
     </div>
   );
 };
