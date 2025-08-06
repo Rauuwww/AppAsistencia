@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { asistenciasAPI, eventosAPI } from '../services/api';
+import QRCodeStyling from 'qr-code-styling';
 
 const AssistantRegistration = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +13,33 @@ const AssistantRegistration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [lastQRData, setLastQRData] = useState(null); // { invitadoId, nombreUsuario, empresa }
+  const qrRef = useRef(null);
+  const qrInstance = useRef(null);
 
   useEffect(() => {
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    if (showQRModal && lastQRData && qrRef.current) {
+      // Generar el QR solo cuando se muestra el modal
+      const qr = new QRCodeStyling({
+        width: 260,
+        height: 260,
+        margin: 10,
+        data: lastQRData.invitadoId,
+        dotsOptions: { color: '#4F9EFF', type: 'rounded' },
+        backgroundOptions: { color: '#fff' },
+        cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
+        cornersDotOptions: { color: '#4F9EFF', type: 'dot' }
+      });
+      qrRef.current.innerHTML = '';
+      qr.append(qrRef.current);
+      qrInstance.current = qr;
+    }
+  }, [showQRModal, lastQRData]);
 
   const loadEvents = async () => {
     try {
@@ -58,7 +82,18 @@ const AssistantRegistration = () => {
         ...formData,
         asistio: 0 // Por defecto no asistió hasta que escanee el QR
       });
-      
+      // Generar invitadoId igual que getQRCode
+      const selectedEvent = events.find(e => e.id == formData.eventoId);
+      const nombreEvento = selectedEvent.nombre.replace(/\s+/g, '_');
+      const usuarioSan = formData.nombreUsuario.replace(/\s+/g, '_');
+      const empresaSan = formData.empresa.replace(/\s+/g, '_');
+      const invitadoId = `${nombreEvento}_${usuarioSan}_${empresaSan}`;
+      setLastQRData({
+        invitadoId,
+        nombreUsuario: formData.nombreUsuario,
+        empresa: formData.empresa
+      });
+      setShowQRModal(true);
       showMessage('Asistente registrado exitosamente', 'success');
       setFormData({
         nombreUsuario: '',
@@ -87,6 +122,12 @@ const AssistantRegistration = () => {
     const empresaSan = formData.empresa.replace(/\s+/g, '_');
     
     return `${nombreEvento}_${usuarioSan}_${empresaSan}`;
+  };
+
+  const handleDownloadQR = () => {
+    if (qrInstance.current) {
+      qrInstance.current.download({ name: lastQRData.invitadoId, extension: 'png' });
+    }
   };
 
   return (
@@ -270,6 +311,52 @@ const AssistantRegistration = () => {
           </form>
         </div>
       </div>
+
+      {/* Modal para mostrar y descargar el QR único del usuario registrado */}
+      {showQRModal && lastQRData && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header del modal */}
+            <div className="bg-gradient-to-r from-primary/10 to-primary-light/10 px-6 py-4 border-b border-border">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-4">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-text-primary">
+                  QR del Asistente Registrado
+                </h3>
+              </div>
+            </div>
+            {/* Contenido del modal */}
+            <div className="p-6">
+              <div className="space-y-4 mb-6">
+                <div className="flex flex-col items-center">
+                  <div ref={qrRef} className="mb-4"></div>
+                  <p className="text-base text-text-primary font-medium mb-1">{lastQRData.nombreUsuario}</p>
+                  <p className="text-sm text-text-secondary mb-1">{lastQRData.empresa}</p>
+                  <p className="text-xs text-text-secondary">ID: <span className="font-mono">{lastQRData.invitadoId}</span></p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleDownloadQR}
+                  className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 hover:bg-primary-light hover:shadow-lg transform hover:-translate-y-0.5 mb-2"
+                >
+                  Descargar QR
+                </button>
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="w-full bg-surface border border-primary text-primary py-3 px-6 rounded-lg font-medium transition-all duration-200 hover:bg-highlight hover:text-primary"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
