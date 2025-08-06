@@ -34,7 +34,19 @@ const QRGenerator = () => {
     cornersDotOptions: {
       color: '#4F9EFF',
       type: 'dot'
-    }
+    },
+    qrOptions: {
+      typeNumber: 0,
+      mode: 'Byte',
+      errorCorrectionLevel: 'M'
+    },
+    imageOptions: {
+      hideBackgroundDots: true,
+      imageSize: 0.3,
+      margin: 10,
+      crossOrigin: 'anonymous'
+    },
+    image: undefined
   });
   
   const qrRef = useRef(null);
@@ -156,6 +168,10 @@ const QRGenerator = () => {
             // Agregar texto después de dibujar el logo
             addTextToPreviewCanvas();
           };
+          img.onerror = () => {
+            // Si falla la carga del logo, continuar sin él
+            addTextToPreviewCanvas();
+          };
           img.src = qrStyle.image;
         } else {
           // Si no hay logo, agregar texto directamente
@@ -254,7 +270,10 @@ const QRGenerator = () => {
                       ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
                       logoResolve();
                     };
-                    img.onerror = () => logoResolve(); // Continuar si falla el logo
+                    img.onerror = () => {
+                      console.warn('Error cargando logo, continuando sin él');
+                      logoResolve(); // Continuar si falla el logo
+                    };
                     img.src = qrStyle.image;
                   });
                 }

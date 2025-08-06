@@ -44,16 +44,31 @@ const QRConfigModal = ({ isOpen, onClose, qrStyle, setQrStyle }) => {
   };
 
   const toggleLogo = () => {
-    setQrStyle(prev => ({
-      ...prev,
-      imageOptions: prev.imageOptions?.hideBackgroundDots ? undefined : {
-        hideBackgroundDots: true,
-        imageSize: 0.3,
-        margin: 10,
-        crossOrigin: 'anonymous'
-      },
-      image: prev.imageOptions?.hideBackgroundDots ? undefined : 'https://i.imgur.com/g4hAfqU.png'
-    }));
+    setQrStyle(prev => {
+      if (prev.image) {
+        // Si el logo está activo, desactivarlo
+        return {
+          ...prev,
+          image: undefined,
+          imageOptions: {
+            ...prev.imageOptions,
+            hideBackgroundDots: false
+          }
+        };
+      } else {
+        // Si el logo está inactivo, activarlo
+        return {
+          ...prev,
+          image: 'https://i.imgur.com/g4hAfqU.png',
+          imageOptions: {
+            hideBackgroundDots: true,
+            imageSize: 0.3,
+            margin: 10,
+            crossOrigin: 'anonymous'
+          }
+        };
+      }
+    });
   };
 
   const updateImageSize = (size) => {

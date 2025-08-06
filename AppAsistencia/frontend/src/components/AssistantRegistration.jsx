@@ -21,15 +21,33 @@ const AssistantRegistration = () => {
     width: 300,
     height: 350,
     margin: 15,
-    dotsOptions: { color: '#4F9EFF', type: 'rounded' },
-    backgroundOptions: { color: '#fff' },
-    cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
-    cornersDotOptions: { color: '#4F9EFF', type: 'dot' },
-    qrOptions: { 
+    dotsOptions: {
+      color: '#4F9EFF',
+      type: 'rounded'
+    },
+    backgroundOptions: {
+      color: '#fff'
+    },
+    cornersSquareOptions: {
+      color: '#4F9EFF',
+      type: 'extra-rounded'
+    },
+    cornersDotOptions: {
+      color: '#4F9EFF',
+      type: 'dot'
+    },
+    qrOptions: {
       typeNumber: 0,
       mode: 'Byte',
       errorCorrectionLevel: 'M'
-    }
+    },
+    imageOptions: {
+      hideBackgroundDots: true,
+      imageSize: 0.3,
+      margin: 10,
+      crossOrigin: 'anonymous'
+    },
+    image: undefined
   });
   const qrRef = useRef(null);
   const qrInstance = useRef(null);
@@ -84,6 +102,10 @@ const AssistantRegistration = () => {
               
               // Agregar texto debajo del QR después de dibujar el logo
               addTextToCanvas();
+            };
+            img.onerror = () => {
+              console.warn('Error cargando logo, continuando sin él');
+              addTextToCanvas(); // Continuar sin logo si falla
             };
             img.src = qrStyle.image;
           } else {
