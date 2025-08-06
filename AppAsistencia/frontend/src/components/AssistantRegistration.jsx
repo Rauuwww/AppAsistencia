@@ -26,18 +26,63 @@ const AssistantRegistration = () => {
     if (showQRModal && lastQRData && qrRef.current) {
       // Generar el QR solo cuando se muestra el modal
       const qr = new QRCodeStyling({
-        width: 260,
-        height: 260,
-        margin: 10,
+        width: 300,
+        height: 350, // Aumentamos altura para incluir texto
+        margin: 15,
         data: lastQRData.invitadoId,
         dotsOptions: { color: '#4F9EFF', type: 'rounded' },
         backgroundOptions: { color: '#fff' },
         cornersSquareOptions: { color: '#4F9EFF', type: 'extra-rounded' },
-        cornersDotOptions: { color: '#4F9EFF', type: 'dot' }
+        cornersDotOptions: { color: '#4F9EFF', type: 'dot' },
+        qrOptions: { 
+          typeNumber: 0,
+          mode: 'Byte',
+          errorCorrectionLevel: 'M'
+        }
       });
-      qrRef.current.innerHTML = '';
-      qr.append(qrRef.current);
-      qrInstance.current = qr;
+      
+      // Crear canvas personalizado con texto
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 300;
+      canvas.height = 350;
+      
+      // Fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Generar QR en canvas temporal
+      const tempDiv = document.createElement('div');
+      qr.append(tempDiv);
+      
+      // Esperar a que se genere el QR y luego agregarlo al canvas principal
+      setTimeout(() => {
+        const qrCanvas = tempDiv.querySelector('canvas');
+        if (qrCanvas) {
+          // Dibujar el QR en el canvas principal (posición superior)
+          ctx.drawImage(qrCanvas, 15, 15, 270, 270);
+          
+          // Agregar texto debajo del QR
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#1E1E2E';
+          
+          // Nombre del usuario
+          ctx.font = 'bold 16px Arial, sans-serif';
+          ctx.fillText(lastQRData.nombreUsuario, canvas.width / 2, 310);
+          
+          // Empresa
+          ctx.font = '14px Arial, sans-serif';
+          ctx.fillStyle = '#4F9EFF';
+          ctx.fillText(lastQRData.empresa, canvas.width / 2, 330);
+          
+          // Limpiar el contenedor y agregar el canvas final
+          qrRef.current.innerHTML = '';
+          qrRef.current.appendChild(canvas);
+          
+          // Guardar referencia para descarga
+          qrInstance.current = { canvas };
+        }
+      }, 100);
     }
   }, [showQRModal, lastQRData]);
 
@@ -125,8 +170,12 @@ const AssistantRegistration = () => {
   };
 
   const handleDownloadQR = () => {
-    if (qrInstance.current) {
-      qrInstance.current.download({ name: lastQRData.invitadoId, extension: 'png' });
+    if (qrInstance.current && qrInstance.current.canvas) {
+      // Crear enlace de descarga
+      const link = document.createElement('a');
+      link.download = `${lastQRData.invitadoId}.png`;
+      link.href = qrInstance.current.canvas.toDataURL();
+      link.click();
     }
   };
 
@@ -334,17 +383,20 @@ const AssistantRegistration = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex flex-col items-center">
                   <div ref={qrRef} className="mb-4"></div>
-                  <p className="text-base text-text-primary font-medium mb-1">{lastQRData.nombreUsuario}</p>
-                  <p className="text-sm text-text-secondary mb-1">{lastQRData.empresa}</p>
-                  <p className="text-xs text-text-secondary">ID: <span className="font-mono">{lastQRData.invitadoId}</span></p>
+                  <p className="text-xs text-text-secondary text-center">
+                    QR incluye nombre del usuario y empresa
+                  </p>
                 </div>
               </div>
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleDownloadQR}
-                  className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 hover:bg-primary-light hover:shadow-lg transform hover:-translate-y-0.5 mb-2"
+                  className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 hover:bg-primary-light hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center"
                 >
-                  Descargar QR
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Descargar QR con Información
                 </button>
                 <button
                   onClick={() => setShowQRModal(false)}

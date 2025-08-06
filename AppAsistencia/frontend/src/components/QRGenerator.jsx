@@ -106,6 +106,17 @@ const QRGenerator = () => {
 
     // Generar QR del primer asistente como preview
     const firstAssistant = eventAssistants[0];
+    
+    // Crear canvas personalizado con texto
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = qrStyle.width;
+    canvas.height = qrStyle.height + 80; // Espacio extra para texto
+    
+    // Fondo blanco
+    ctx.fillStyle = qrStyle.backgroundOptions.color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
     const qrCodeInstance = new QRCodeStyling({
       ...qrStyle,
       data: firstAssistant.invitadoId,
@@ -116,9 +127,39 @@ const QRGenerator = () => {
       }
     });
 
-    qrRef.current.innerHTML = '';
-    qrCodeInstance.append(qrRef.current);
-    setPreviewQR(qrCodeInstance);
+    // Generar QR en div temporal
+    const tempDiv = document.createElement('div');
+    qrCodeInstance.append(tempDiv);
+    
+    // Esperar a que se genere el QR y luego agregarlo al canvas principal
+    setTimeout(() => {
+      const qrCanvas = tempDiv.querySelector('canvas');
+      if (qrCanvas) {
+        // Dibujar el QR en el canvas principal
+        ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+        
+        // Agregar texto debajo del QR
+        ctx.textAlign = 'center';
+        const centerX = canvas.width / 2;
+        const textY = qrStyle.height + 20;
+        
+        // Nombre del usuario
+        ctx.font = 'bold 16px Arial, sans-serif';
+        ctx.fillStyle = qrStyle.dotsOptions.color;
+        ctx.fillText(firstAssistant.nombreUsuario, centerX, textY);
+        
+        // Empresa
+        ctx.font = '14px Arial, sans-serif';
+        ctx.fillStyle = qrStyle.dotsOptions.color;
+        ctx.fillText(firstAssistant.empresa, centerX, textY + 25);
+        
+        // Limpiar el contenedor y agregar el canvas final
+        qrRef.current.innerHTML = '';
+        qrRef.current.appendChild(canvas);
+        
+        setPreviewQR({ canvas });
+      }
+    }, 100);
   };
 
   const generateAllQRs = async (format) => {
@@ -138,29 +179,84 @@ const QRGenerator = () => {
       for (let i = 0; i < eventAssistants.length; i++) {
         const assistant = eventAssistants[i];
         
-        // Crear instancia de QR para cada asistente
-        const qrCodeInstance = new QRCodeStyling({
-          ...qrStyle,
-          data: assistant.invitadoId,
-          image: undefined,
-          imageOptions: {
-            crossOrigin: 'anonymous',
-            margin: 20
-          }
-        });
+        if (format === 'png') {
+          // Para PNG, crear canvas personalizado con texto
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = qrStyle.width;
+          canvas.height = qrStyle.height + 80; // Espacio extra para texto
+          
+          // Fondo blanco
+          ctx.fillStyle = qrStyle.backgroundOptions.color;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Crear QR temporal
+          const qrCodeInstance = new QRCodeStyling({
+            ...qrStyle,
+            data: assistant.invitadoId,
+            image: undefined,
+            imageOptions: {
+              crossOrigin: 'anonymous',
+              margin: 20
+            }
+          });
 
-        // Generar el archivo
-        const qrData = await new Promise((resolve) => {
-          if (format === 'svg') {
+          // Generar QR en div temporal
+          const tempDiv = document.createElement('div');
+          qrCodeInstance.append(tempDiv);
+          
+          // Esperar a que se genere el QR
+          await new Promise((resolve) => {
+            setTimeout(() => {
+              const qrCanvas = tempDiv.querySelector('canvas');
+              if (qrCanvas) {
+                // Dibujar el QR en el canvas principal
+                ctx.drawImage(qrCanvas, qrStyle.margin, qrStyle.margin, qrStyle.width - (qrStyle.margin * 2), qrStyle.height - (qrStyle.margin * 2));
+                
+                // Agregar texto debajo del QR
+                ctx.textAlign = 'center';
+                const centerX = canvas.width / 2;
+                const textY = qrStyle.height + 20;
+                
+                // Nombre del usuario
+                ctx.font = 'bold 16px Arial, sans-serif';
+                ctx.fillStyle = qrStyle.dotsOptions.color;
+                ctx.fillText(assistant.nombreUsuario, centerX, textY);
+                
+                // Empresa
+                ctx.font = '14px Arial, sans-serif';
+                ctx.fillStyle = qrStyle.dotsOptions.color;
+                ctx.fillText(assistant.empresa, centerX, textY + 25);
+              }
+              resolve();
+            }, 100);
+          });
+
+          // Convertir canvas a blob y añadir al ZIP
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          const fileName = `${assistant.nombreUsuario.replace(/[^a-zA-Z0-9]/g, '_')}_${assistant.empresa.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+          zip.file(fileName, blob);
+          
+        } else {
+          // Para SVG, generar normalmente (sin texto personalizado por limitaciones de SVG)
+          const qrCodeInstance = new QRCodeStyling({
+            ...qrStyle,
+            data: assistant.invitadoId,
+            image: undefined,
+            imageOptions: {
+              crossOrigin: 'anonymous',
+              margin: 20
+            }
+          });
+
+          const qrData = await new Promise((resolve) => {
             qrCodeInstance.getRawData('svg').then(resolve);
-          } else {
-            qrCodeInstance.getRawData('png').then(resolve);
-          }
-        });
+          });
 
-        // Añadir al ZIP
-        const fileName = `${assistant.nombreUsuario.replace(/[^a-zA-Z0-9]/g, '_')}_${assistant.empresa.replace(/[^a-zA-Z0-9]/g, '_')}.${format}`;
-        zip.file(fileName, qrData);
+          // Añadir al ZIP
+          const fileName = `${assistant.nombreUsuario.replace(/[^a-zA-Z0-9]/g, '_')}_${assistant.empresa.replace(/[^a-zA-Z0-9]/g, '_')}.svg`;
+          zip.file(fileName, qrData);
+        }
         
         // Actualizar progreso
         setGenerationProgress(Math.round(((i + 1) / eventAssistants.length) * 100));
@@ -170,7 +266,7 @@ const QRGenerator = () => {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       saveAs(zipBlob, `QR_Codes_${folderName}.zip`);
       
-      showMessage(`${eventAssistants.length} códigos QR generados y descargados en formato ${format.toUpperCase()}`, 'success');
+      showMessage(`${eventAssistants.length} códigos QR generados y descargados en formato ${format.toUpperCase()}${format === 'png' ? ' con información de empresa' : ''}`, 'success');
     } catch (error) {
       console.error('Error generating QRs:', error);
       showMessage('Error al generar los códigos QR', 'error');
@@ -459,7 +555,7 @@ const QRGenerator = () => {
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          {eventAssistants.length} PNG
+                          {eventAssistants.length} PNG + Info
                         </span>
                       )}
                     </button>
