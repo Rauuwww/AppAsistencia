@@ -85,7 +85,7 @@ const useValidation = (initialValues = {}) => {
   }, [errors]);
 
   // Actualizar múltiples valores
-  const setValues = useCallback((newValues) => {
+  const updateValues = useCallback((newValues) => {
     setValues(prev => ({ ...prev, ...newValues }));
   }, []);
 
@@ -104,7 +104,7 @@ const useValidation = (initialValues = {}) => {
     values,
     errors,
     setValue,
-    setValues,
+    updateValues,
     validateField,
     validateForm,
     clearErrors,
