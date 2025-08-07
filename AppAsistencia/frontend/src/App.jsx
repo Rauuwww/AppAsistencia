@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import AttendanceScanner from './components/AttendanceScanner';
-import EventsList from './components/EventsList';
+import AssistantRegistration from './components/AssistantRegistration';
 import AttendanceList from './components/AttendanceList';
 import EventRegistration from './components/EventRegistration';
-import AssistantRegistration from './components/AssistantRegistration';
+import EventsList from './components/EventsList';
 import QRGenerator from './components/QRGenerator';
 import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import ConfiguracionSistema from './components/ConfiguracionSistema';
+import MessageAlert from './components/MessageAlert';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('scanner');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState('');
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  // Verificar autenticación al cargar la aplicación
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
     const currentUser = localStorage.getItem('user');
-    
     if (authStatus === 'true' && currentUser) {
       setIsAuthenticated(true);
       setUser(currentUser);
@@ -36,39 +38,47 @@ function App() {
     setUser('');
   };
 
+  const showMessage = (text, type = 'info', autoClose = true) => {
+    setMessage({ text, type, autoClose });
+  };
+
+  const clearMessage = () => {
+    setMessage({ type: '', text: '' });
+  };
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard />;
       case 'scanner':
-        return <AttendanceScanner />;
-      case 'register-event':
-        return <EventRegistration />;
-      case 'register-assistant':
-        return <AssistantRegistration />;
-      case 'qr-generator':
-        return <QRGenerator />;
+        return <AttendanceScanner showMessage={showMessage} />;
+      case 'registration':
+        return <AssistantRegistration showMessage={showMessage} />;
+      case 'list':
+        return <AttendanceList showMessage={showMessage} />;
       case 'events':
-        return <EventsList />;
-      case 'attendance':
-        return <AttendanceList />;
+        return <EventRegistration showMessage={showMessage} />;
+      case 'eventsList':
+        return <EventsList showMessage={showMessage} />;
+      case 'qrGenerator':
+        return <QRGenerator showMessage={showMessage} />;
+      case 'config':
+        return <ConfiguracionSistema />;
       default:
-        return <AttendanceScanner />;
+        return <Dashboard />;
     }
   };
 
-  // Si no está autenticado, mostrar el login
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
   }
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      {/* Header con elevación Material UI */}
+      {/* Header */}
       <header className="bg-surface border-b border-border shadow-lg">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          {/* Layout responsive para el header */}
           <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            
-            {/* Información del usuario y botón de logout - Móvil arriba, Desktop derecha */}
             <div className="flex items-center justify-between w-full sm:w-auto sm:order-2">
               <div className="text-right mr-4 sm:mr-6">
                 <p className="text-xs sm:text-sm text-text-secondary font-light">Usuario</p>
@@ -85,8 +95,6 @@ function App() {
                 <span className="sm:hidden">Salir</span>
               </button>
             </div>
-
-            {/* Título principal - Centrado en móvil, izquierda en desktop */}
             <div className="text-center sm:text-left sm:order-1 sm:flex-1">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-text-primary font-sans">
                 Sistema de Asistencia QR
@@ -95,37 +103,32 @@ function App() {
                 Gestión de eventos y control de asistencia mediante códigos QR
               </p>
             </div>
-
-            {/* Espaciador invisible para mantener el centrado en desktop */}
             <div className="hidden sm:block sm:order-3 sm:w-48"></div>
           </div>
         </div>
       </header>
 
-      {/* Navigation con estilo Material UI */}
-      <div className="bg-surface border-b border-border shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6">
-          <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
-        </div>
-      </div>
+      {/* Navigation */}
+      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Main Content con padding y estructura Material UI */}
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto">
-          {renderContent()}
-        </div>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 sm:px-6 py-8">
+        {renderContent()}
       </main>
 
-      {/* Footer con estilo Material UI */}
-      <footer className="bg-surface border-t border-border mt-12 sm:mt-16">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      {/* Footer */}
+      <footer className="bg-surface border-t border-border py-6 mt-auto">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center">
-            <p className="text-xs sm:text-sm text-text-secondary font-light">
-              &copy; 2024 Sistema de Asistencia QR. Desarrollado con React y Tailwind CSS.
+            <p className="text-sm text-text-secondary">
+              © 2024 Sistema de Asistencia QR. Desarrollado con ❤️ para gestión profesional de eventos.
             </p>
           </div>
         </div>
       </footer>
+
+      {/* Message Alert */}
+      <MessageAlert message={message} onClose={clearMessage} />
     </div>
   );
 }
